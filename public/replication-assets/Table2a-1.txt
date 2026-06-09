@@ -1,0 +1,13 @@
+		(1)	(2)	(3)
+VARIABLES	LABELS	sd_mom_ceopay_econ	sd_mom_ceopay_econ	sd_mom_ceopay_noopt_econ
+				
+t1	Annual trend variable	0.001	-0.001	0.001
+		(1.298)	(-0.905)	(1.307)
+cumGrowth_md_ceopay	cumGrowth_md_ceopay	0.060	-0.026	-0.044
+		(0.719)	(-0.421)	(-0.568)
+Constant	Constant	1.667***	1.302***	1.677***
+		(18.655)	(19.581)	(20.362)
+				
+Observations		37,338	37,338	37,338
+R-squared		0.065	0.062	0.069
+Industry x Size FE		Yes	Yes	Yes

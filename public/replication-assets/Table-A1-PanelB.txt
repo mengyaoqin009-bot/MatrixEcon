@@ -1,0 +1,30 @@
+		(1)	(2)	(3)	(4)	(5)	(6)	(7)	(8)	(9)
+VARIABLES	LABELS	sd_mom_ceopay_econ	sd_mom_ceopay_econ	sd_mom_ceopay_econ	sd_mom_abn_ceopay_econ	sd_mom_abn_ceopay_econ	sd_mom_abn_ceopay_econ	sd_mom_ceopay_noopt_econ	sd_mom_ceopay_noopt_econ	sd_mom_ceopay_noopt_econ
+										
+t	Annual trend variable	0.001*	0.001*	0.001*	0.001**	0.001**	0.001**	0.000	0.000	0.000
+		(1.907)	(1.809)	(1.767)	(2.347)	(2.316)	(2.329)	(0.827)	(0.703)	(0.737)
+frac_sameConsultants	frac_sameConsultants	0.029*	0.029*	0.028*	-0.017	-0.018	-0.018	0.002	0.001	0.000
+		(1.775)	(1.785)	(1.712)	(-1.337)	(-1.446)	(-1.400)	(0.205)	(0.074)	(0.055)
+lag_log_at_real	lag_log_at_real		-0.002*	-0.002*		-0.002**	-0.002**		-0.000	-0.000
+			(-1.674)	(-1.656)		(-2.198)	(-2.025)		(-0.207)	(-0.260)
+lag_tobins_q	lag_tobins_q		0.002	0.002		0.001	0.001		0.000	0.000
+			(1.271)	(1.211)		(0.622)	(0.648)		(0.311)	(0.301)
+lag_sales_growth	lag_sales_growth		-0.015*	-0.016*		0.003	0.003		0.001	0.000
+			(-1.870)	(-1.949)		(0.436)	(0.423)		(0.110)	(0.020)
+lag_stock_ret_12m	lag_stock_ret_12m		0.007	0.007		0.004	0.004		0.003	0.003
+			(1.244)	(1.223)		(0.931)	(0.862)		(1.103)	(1.048)
+lag_idio_ret_vol_12m	lag_idio_ret_vol_12m		0.002	0.003		0.006	0.005		0.011	0.012
+			(0.129)	(0.171)		(0.481)	(0.399)		(1.198)	(1.343)
+cumGrowth_md_ceopay	cumGrowth_md_ceopay		-0.004	-0.005		0.004	0.004			
+			(-1.125)	(-1.175)		(1.281)	(1.219)			
+cumGrowth_md_ceopay_noopt	cumGrowth_md_ceopay_noopt								-0.002	-0.002
+									(-1.373)	(-1.390)
+Constant	Constant	2.592***	2.616***	2.616***	2.128***	2.139***	2.138***	1.168***	1.170***	1.170***
+		(507.449)	(161.210)	(161.988)	(538.240)	(163.473)	(164.091)	(429.000)	(138.075)	(140.284)
+										
+Observations		370,169	368,268	368,268	370,169	368,268	368,268	370,169	368,268	368,268
+R-squared		0.000	0.001	0.007	0.000	0.001	0.006	0.000	0.001	0.007
+Firm controls		No	Yes	Yes	No	Yes	Yes	No	Yes	Yes
+Industry X Size FE		No	Yes	Yes	No	Yes	Yes	No	Yes	Yes
+Firm FE		No	No	Yes	No	No	Yes	No	No	Yes
+Clustering		Firm	Firm	Firm	Firm	Firm	Firm	Firm	Firm	Firm

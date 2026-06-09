@@ -1,0 +1,2600 @@
+{
+  "file": "prepare-simulations.do",
+  "language": "Stata",
+  "purpose": "按照 ISS 行业与规模规则模拟 CEO 薪酬路径",
+  "lineCount": 432,
+  "records": [
+    {
+      "line": 1,
+      "code": "***************************************f****************************************************************************************",
+      "section": "文件初始化",
+      "explanation": "代码注释：f****************************************************************************************"
+    },
+    {
+      "line": 2,
+      "code": "* Purpose: Do-file to simulate what would happen to CEO pay if every firm followed the precise 2012 ISS peer group ",
+      "section": "文件初始化",
+      "explanation": "代码注释：Purpose: Do-file to simulate what would happen to CEO pay if every firm followed the precise 2012 ISS peer group"
+    },
+    {
+      "line": 3,
+      "code": "*          methodology to select their compensation peers.",
+      "section": "文件初始化",
+      "explanation": "代码注释：methodology to select their compensation peers."
+    },
+    {
+      "line": 4,
+      "code": "* ",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 5,
+      "code": "* Notes: ",
+      "section": "文件初始化",
+      "explanation": "代码注释：Notes:"
+    },
+    {
+      "line": 6,
+      "code": "*   - Creates several large temporary files (e.g., _pairs.dta with >5 GB) before deleting them again.",
+      "section": "文件初始化",
+      "explanation": "代码注释：- Creates several large temporary files (e.g., _pairs.dta with >5 GB) before deleting them again."
+    },
+    {
+      "line": 7,
+      "code": "*   - Running all simulations (that is, all the target percentiles) takes a couple of hours.",
+      "section": "文件初始化",
+      "explanation": "代码注释：- Running all 模拟s (that is, all the target percentiles) takes a couple of hours."
+    },
+    {
+      "line": 8,
+      "code": "*   - Main program starts at around line 430",
+      "section": "文件初始化",
+      "explanation": "代码注释：- Main program starts at around line 430"
+    },
+    {
+      "line": 9,
+      "code": "********************************************************************************************************************************",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 10,
+      "code": "\t\t",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 11,
+      "code": "\t************************************************************************************************************************",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 12,
+      "code": "\t* Program to create ISS peergroups",
+      "section": "文件初始化",
+      "explanation": "代码注释：Program to create ISS peergroups"
+    },
+    {
+      "line": 13,
+      "code": "\t*   - Input:  uses \"pairs.dta\" which is the universe of potential peers with a bunch of firm characteristics",
+      "section": "文件初始化",
+      "explanation": "代码注释：- Input:  uses \"pairs.dta\" which is the universe of potential peers with a bunch of firm characteristics"
+    },
+    {
+      "line": 14,
+      "code": "\t*   - Output: \"peergroups-iss.dta\"",
+      "section": "文件初始化",
+      "explanation": "代码注释：- Output: \"peergroups-iss.dta\""
+    },
+    {
+      "line": 15,
+      "code": "\t************************************************************************************************************************\t",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 16,
+      "code": "\tcapture program drop createISSpeergroups",
+      "section": "文件初始化",
+      "explanation": "捕获可能出现的错误，使删除旧文件或处理可选对象时脚本可以继续运行。"
+    },
+    {
+      "line": 17,
+      "code": "\tprogram define createISSpeergroups",
+      "section": "文件初始化",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 18,
+      "code": "\t\tlocal yr=`1'",
+      "section": "文件初始化",
+      "explanation": "定义全局或局部宏，用于复用路径、变量列表、循环参数或输出名称。"
+    },
+    {
+      "line": 19,
+      "code": "\t\tuse \"_pairs-`yr'\", clear\t",
+      "section": "文件初始化",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 20,
+      "code": "\t\tdrop if cik_1==. | cik_2==.",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 21,
+      "code": "\t\t",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 22,
+      "code": "\t\t************************************************************************************************************************",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 23,
+      "code": "\t\t* ISS PEER GROUP METHODOLOGY",
+      "section": "文件初始化",
+      "explanation": "代码注释：ISS PEER GROUP METHODOLOGY"
+    },
+    {
+      "line": 24,
+      "code": "\t\t*  Creating the Peer Universe: ISS chooses companies ... ",
+      "section": "文件初始化",
+      "explanation": "代码注释：Creating the Peer Universe: ISS chooses companies ..."
+    },
+    {
+      "line": 25,
+      "code": "\t\t*   i)   in the same 2-digit GICS universe as the subject, ",
+      "section": "文件初始化",
+      "explanation": "代码注释：i)   in the same 2-digit GICS universe as the subject,"
+    },
+    {
+      "line": 26,
+      "code": "\t\t*   ii)  between 0.45 times and 2.1 times the subject company's annual revenues (assets for financial companies), and",
+      "section": "文件初始化",
+      "explanation": "代码注释：ii)  between 0.45 times and 2.1 times the subject company's annual revenues (assets for financial companies), and"
+    },
+    {
+      "line": 27,
+      "code": "\t\t*   iii) with market capitalizations of between 0.2 times and 5 times the subject company. ",
+      "section": "文件初始化",
+      "explanation": "代码注释：iii) with market capitalizations of between 0.2 times and 5 times the subject company."
+    },
+    {
+      "line": 28,
+      "code": "\t\t************************************************************************************************************************",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 29,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 30,
+      "code": "\t\t* i) same 2-digit GICS",
+      "section": "文件初始化",
+      "explanation": "代码注释：i) same 2-digit GICS"
+    },
+    {
+      "line": 31,
+      "code": "\t\tkeep if int(gics6_1/10000)==int(gics6_2/10000)",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 32,
+      "code": "\t\t",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 33,
+      "code": "\t\t* ii) between 0.45 and 2.1 times the subject company's annual revenues (assets for financial companies)",
+      "section": "文件初始化",
+      "explanation": "代码注释：ii) between 0.45 and 2.1 times the subject company's annual revenues (assets for financial companies)"
+    },
+    {
+      "line": 34,
+      "code": "\t\tg size_1=.",
+      "section": "文件初始化",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 35,
+      "code": "\t\t\treplace size_1=revt_1",
+      "section": "文件初始化",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 36,
+      "code": "\t\t\treplace size_1=at_1 if inlist(gics6_1, 401010, 401020, 402010, 402020)",
+      "section": "文件初始化",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 37,
+      "code": "\t\tg size_2=.",
+      "section": "文件初始化",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 38,
+      "code": "\t\t\treplace size_2=revt_2",
+      "section": "文件初始化",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 39,
+      "code": "\t\t\treplace size_2=at_2 if inlist(gics6_2, 401010, 401020, 402010, 402020)",
+      "section": "文件初始化",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 40,
+      "code": "\t\tkeep if inrange(size_2, 0.45*size_1, 2.1*size_1)",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 41,
+      "code": "\t\t",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 42,
+      "code": "\t\t* iii) with market cap of between 0.2 and 5 times the subject company. ",
+      "section": "文件初始化",
+      "explanation": "代码注释：iii) with market cap of between 0.2 and 5 times the subject company."
+    },
+    {
+      "line": 43,
+      "code": "\t\tkeep if inrange(mktcap_2, 0.2*mktcap_1, 5*mktcap_1)",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 44,
+      "code": "\t\tcount",
+      "section": "文件初始化",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 45,
+      "code": "\t\t",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 46,
+      "code": "\t\t************************************************************************************************************************",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 47,
+      "code": "\t\t* ISS selects companies from the comparison universe that are ",
+      "section": "文件初始化",
+      "explanation": "代码注释：ISS selects companies from the comparison universe that are"
+    },
+    {
+      "line": 48,
+      "code": "\t\t*   - in the subject company's 6-digit GICS category, ",
+      "section": "文件初始化",
+      "explanation": "代码注释：- in the subject company's 6-digit GICS category,"
+    },
+    {
+      "line": 49,
+      "code": "\t\t*   - first selecting the companies closest in size, while where possible alternating between companies larger and ",
+      "section": "文件初始化",
+      "explanation": "代码注释：- first selecting the companies closest in size, while where possible alternating between companies larger and"
+    },
+    {
+      "line": 50,
+      "code": "\t\t*     smaller than the subject company so as to maintain the subject at or near the median of the chosen comparison group. ",
+      "section": "文件初始化",
+      "explanation": "代码注释：smaller than the subject company so as to maintain the subject at or near the median of the chosen comparison group."
+    },
+    {
+      "line": 51,
+      "code": "\t\t*   - If the comparison group reaches the minimum 14 members, it is considered complete; ",
+      "section": "文件初始化",
+      "explanation": "代码注释：- If the comparison group reaches the minimum 14 members, it is considered complete;"
+    },
+    {
+      "line": 52,
+      "code": "\t\t*     up to 24 comparison companies can be selected from the 6-digit GICS category.",
+      "section": "文件初始化",
+      "explanation": "代码注释：up to 24 comparison companies can be selected from the 6-digit GICS category."
+    },
+    {
+      "line": 53,
+      "code": "\t\t*",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 54,
+      "code": "\t\t*  => if not 14 companies yet, then repeat with GICS4, then GICS2, until at least 14 companies found. ",
+      "section": "文件初始化",
+      "explanation": "代码注释：=> if not 14 companies yet, then repeat with GICS4, then GICS2, until at least 14 companies found."
+    },
+    {
+      "line": 55,
+      "code": "\t\t************************************************************************************************************************",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 56,
+      "code": "\t\t",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 57,
+      "code": "\t\t* iv) select 14-24 firms as outlined above",
+      "section": "文件初始化",
+      "explanation": "代码注释：iv) select 14-24 firms as outlined above"
+    },
+    {
+      "line": 58,
+      "code": "\t\tg abs_size_diff=abs(size_2-size_1)",
+      "section": "文件初始化",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 59,
+      "code": "\t\tdrop if abs_size_diff==.",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 60,
+      "code": "\t\tsave \"temp\", replace",
+      "section": "文件初始化",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 61,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 62,
+      "code": "\t\t* Round 1: get best matches for GICS6 ",
+      "section": "文件初始化",
+      "explanation": "代码注释：Round 1: get best matches for GICS6"
+    },
+    {
+      "line": 63,
+      "code": "\t\t\tuse \"temp\", clear",
+      "section": "文件初始化",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 64,
+      "code": "\t\t\t\tkeep if gics6_1==gics6_2",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 65,
+      "code": "\t\t\t\tsort cik_1 fyear abs_size_diff",
+      "section": "文件初始化",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 66,
+      "code": "\t\t\t\tbys cik_1 fyear: g n1=_n",
+      "section": "文件初始化",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 67,
+      "code": "\t\t\tsave \"temp_round1\", replace",
+      "section": "文件初始化",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 68,
+      "code": "\t\t\t",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 69,
+      "code": "\t\t* Round 2: get best matches for GICS4 ",
+      "section": "文件初始化",
+      "explanation": "代码注释：Round 2: get best matches for GICS4"
+    },
+    {
+      "line": 70,
+      "code": "\t\t\tuse \"temp\", clear",
+      "section": "文件初始化",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 71,
+      "code": "\t\t\t\tkeep if int(gics6_1/100)==int(gics6_2/100)",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 72,
+      "code": "\t\t\t\t* remove the matches we already got from Round 1",
+      "section": "文件初始化",
+      "explanation": "代码注释：remove the matches we already got from Round 1"
+    },
+    {
+      "line": 73,
+      "code": "\t\t\t\tcount",
+      "section": "文件初始化",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 74,
+      "code": "\t\t\t\tjoinby cik_1 fyear cik_2 using \"temp_round1\", unmatched(master)",
+      "section": "文件初始化",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 75,
+      "code": "\t\t\t\t\ttab  _merge",
+      "section": "文件初始化",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 76,
+      "code": "\t\t\t\t\tbys  cik_1 fyear: egen max_n1=max(n1)",
+      "section": "文件初始化",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 77,
+      "code": "\t\t\t\t\treplace max_n1=0 if max_n1==.",
+      "section": "文件初始化",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 78,
+      "code": "\t\t\t\t\tdrop if n1!=.",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 79,
+      "code": "\t\t\t\t\tdrop _merge n1",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 80,
+      "code": "\t\t\t\tsort cik_1 fyear abs_size_diff",
+      "section": "文件初始化",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 81,
+      "code": "\t\t\t\tbys cik_1 fyear: g n2=_n+max_n1",
+      "section": "文件初始化",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 82,
+      "code": "\t\t\tsave \"temp_round2\", replace",
+      "section": "文件初始化",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 83,
+      "code": "\t\t",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 84,
+      "code": "\t\t* Round 3: get best matches for GICS2",
+      "section": "文件初始化",
+      "explanation": "代码注释：Round 3: get best matches for GICS2"
+    },
+    {
+      "line": 85,
+      "code": "\t\t\tuse temp, clear",
+      "section": "文件初始化",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 86,
+      "code": "\t\t\tkeep if int(gics6_1/10000)==int(gics6_2/10000)",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 87,
+      "code": "\t\t\t* remove the matches we algready got from Rounds 1 and 2",
+      "section": "文件初始化",
+      "explanation": "代码注释：remove the matches we algready got from Rounds 1 and 2"
+    },
+    {
+      "line": 88,
+      "code": "\t\t\tcount",
+      "section": "文件初始化",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 89,
+      "code": "\t\t\tjoinby cik_1 fyear cik_2 using \"temp_round1\", unmatched(master)",
+      "section": "文件初始化",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 90,
+      "code": "\t\t\t\ttab  _merge",
+      "section": "文件初始化",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 91,
+      "code": "\t\t\t\tbys  cik_1 fyear: egen max_n1=max(n1)",
+      "section": "文件初始化",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 92,
+      "code": "\t\t\t\tdrop if n1!=.",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 93,
+      "code": "\t\t\t\tdrop _merge n1",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 94,
+      "code": "\t\t\tcount",
+      "section": "文件初始化",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 95,
+      "code": "\t\t\tjoinby cik_1 fyear cik_2 using \"temp_round2\", unmatched(master)",
+      "section": "文件初始化",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 96,
+      "code": "\t\t\t\ttab  _merge",
+      "section": "文件初始化",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 97,
+      "code": "\t\t\t\tbys  cik_1 fyear: egen max_n2=max(n2)",
+      "section": "文件初始化",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 98,
+      "code": "\t\t\t\treplace max_n2=0 if max_n2==. & max_n1==.",
+      "section": "文件初始化",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 99,
+      "code": "\t\t\t\treplace max_n2=max_n1 if max_n2==. & max_n1!=.",
+      "section": "文件初始化",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 100,
+      "code": "\t\t\t\tdrop if n2!=.",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 101,
+      "code": "\t\t\t\tdrop _merge n2",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 102,
+      "code": "\t\t\tsort cik_1 fyear abs_size_diff",
+      "section": "文件初始化",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 103,
+      "code": "\t\t\tbys cik_1 fyear: g n3=_n+max_n2",
+      "section": "文件初始化",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 104,
+      "code": "\t\t\tsave \"temp_round3\", replace",
+      "section": "文件初始化",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 105,
+      "code": "\t\t\t\t",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 106,
+      "code": "\t\t* merge the matches",
+      "section": "文件初始化",
+      "explanation": "代码注释：合并 the matches"
+    },
+    {
+      "line": 107,
+      "code": "\t\tuse \"temp_round1\", clear",
+      "section": "文件初始化",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 108,
+      "code": "\t\t\tappend using \"temp_round2\"",
+      "section": "文件初始化",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 109,
+      "code": "\t\t\tappend using \"temp_round3\"",
+      "section": "文件初始化",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 110,
+      "code": "\t\tegen n=rowmax(n1 n2 n3)",
+      "section": "文件初始化",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 111,
+      "code": "\t\tdrop n1 n2 n3 max_n*",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 112,
+      "code": "\t\tgsort cik_1 fyear n",
+      "section": "文件初始化",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 113,
+      "code": "\t\t",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 114,
+      "code": "\t\t* for Add-Drop test: max 50 peers",
+      "section": "文件初始化",
+      "explanation": "代码注释：for Add-Drop test: max 50 peers"
+    },
+    {
+      "line": 115,
+      "code": "\t\tkeep if inrange(n, 1, 50)\t\t",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 116,
+      "code": "\t\tsave \"peergroups-iss-methodology-`yr'-extended\", replace\t",
+      "section": "文件初始化",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 117,
+      "code": "\t\t",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 118,
+      "code": "\t\t* for ISS peergroups: max 24 peers ",
+      "section": "文件初始化",
+      "explanation": "代码注释：for ISS peergroups: max 24 peers"
+    },
+    {
+      "line": 119,
+      "code": "\t\tkeep if inrange(n, 1, 24)",
+      "section": "文件初始化",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 120,
+      "code": "\t\tsave \"peergroups-iss-methodology-`yr'\", replace\t",
+      "section": "文件初始化",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 121,
+      "code": "\t\t\trm \"temp_round1.dta\" ",
+      "section": "文件初始化",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 122,
+      "code": "\t\t\trm \"temp_round2.dta\" ",
+      "section": "文件初始化",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 123,
+      "code": "\t\t\trm \"temp_round3.dta\"",
+      "section": "文件初始化",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 124,
+      "code": "\t\t\trm \"temp.dta\"",
+      "section": "文件初始化",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 125,
+      "code": "\tend",
+      "section": "文件初始化",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 126,
+      "code": "\t*** END OF AUXILIARY PROGRAM *******************************************************************************************",
+      "section": "文件初始化",
+      "explanation": "代码注释：END OF AUXILIARY PROGRAM *******************************************************************************************"
+    },
+    {
+      "line": 127,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 128,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 129,
+      "code": "\t***********************************************************************************************",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 130,
+      "code": "\t* Main program that runs one simulation for a given target percentile",
+      "section": "文件初始化",
+      "explanation": "代码注释：Main program that runs one 模拟 for a given target percentile"
+    },
+    {
+      "line": 131,
+      "code": "\t*   - Parameter 1: target percentile ",
+      "section": "文件初始化",
+      "explanation": "代码注释：- Parameter 1: target percentile"
+    },
+    {
+      "line": 132,
+      "code": "\t*  E.g., \"runSimulation 50\" => assumes firms target the median pay of their ISS peer group",
+      "section": "文件初始化",
+      "explanation": "代码注释：E.g., \"run模拟 50\" => assumes firms target the median pay of their ISS peer group"
+    },
+    {
+      "line": 133,
+      "code": "\t***********************************************************************************************\t",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 134,
+      "code": "\tcapture program drop runSimulation",
+      "section": "文件初始化",
+      "explanation": "捕获可能出现的错误，使删除旧文件或处理可选对象时脚本可以继续运行。"
+    },
+    {
+      "line": 135,
+      "code": "\tprogram define runSimulation",
+      "section": "文件初始化",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 136,
+      "code": "\t\tdi \"=== Running simulation with target percentile=`1' ===\" \t\t",
+      "section": "文件初始化",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 137,
+      "code": "\t\tlocal pctl=`1' ",
+      "section": "文件初始化",
+      "explanation": "定义全局或局部宏，用于复用路径、变量列表、循环参数或输出名称。"
+    },
+    {
+      "line": 138,
+      "code": "\t\t\t\t\t\t",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 139,
+      "code": "\t\t****************************************",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 140,
+      "code": "\t\t* Step 1: Preparations for the loop",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "代码注释：Step 1: Preparations for the loop"
+    },
+    {
+      "line": 141,
+      "code": "\t\t****************************************",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 142,
+      "code": "\t\t",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 143,
+      "code": "\t\t* 1a) Prepare compensation levels for later merging.",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "代码注释：1a) Prepare compensation levels for later merging."
+    },
+    {
+      "line": 144,
+      "code": "\t\tuse \"CEOpay-final\", clear",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 145,
+      "code": "\t\t\t* only need 2006/2007 data (later pay is going to be simulated)",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "代码注释：only need 2006/2007 data (later pay is going to be simulated)"
+    },
+    {
+      "line": 146,
+      "code": "\t\t\tkeep if inrange(fyear, 2006, 2007)",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 147,
+      "code": "\t\t\trename ceopay tdc1",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 148,
+      "code": "\t\t\tkeep cik fyear tdc1 ",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 149,
+      "code": "\t\t\tduplicates drop",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 150,
+      "code": "\t\t\tdrop if cik==.",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 151,
+      "code": "\t\t\tdistinct cik\t",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 152,
+      "code": "\t\tsave \"temp_compensation\", replace",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 153,
+      "code": "\t\t\t",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 154,
+      "code": "\t\t* 1b) Get a reference point -> compute pay dispersion in full economy in 2007",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "代码注释：1b) Get a reference point -> compute 薪酬离散度 in full economy in 2007"
+    },
+    {
+      "line": 155,
+      "code": "\t\tuse \"CEOpay-final\", clear",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 156,
+      "code": "\t\t\tkeep if fyear==2007 ",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 157,
+      "code": "\t\t\tsumm ceopay, detail",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 158,
+      "code": "\t\t\t\tmatrix fyear     [1,1]=2007",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "保存标量或矩阵结果，供后续显著性检验、表格统计量或循环调用。"
+    },
+    {
+      "line": 159,
+      "code": "\t\t\t\tmatrix fullSD    [1,1]=`r(sd)'",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "保存标量或矩阵结果，供后续显著性检验、表格统计量或循环调用。"
+    },
+    {
+      "line": 160,
+      "code": "\t\t\t\tmatrix fullMedian[1,1]=`r(p50)'",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "保存标量或矩阵结果，供后续显著性检验、表格统计量或循环调用。"
+    },
+    {
+      "line": 161,
+      "code": "\t\t\t\tmatrix fullMean  [1,1]=`r(mean)'",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "保存标量或矩阵结果，供后续显著性检验、表格统计量或循环调用。"
+    },
+    {
+      "line": 162,
+      "code": "\t\t\t\tmatrix fullCV    [1,1]=`r(sd)'/`r(p50)'",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "保存标量或矩阵结果，供后续显著性检验、表格统计量或循环调用。"
+    },
+    {
+      "line": 163,
+      "code": "\t\t\t\tmatrix fullN     [1,1]=`r(N)'",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "保存标量或矩阵结果，供后续显著性检验、表格统计量或循环调用。"
+    },
+    {
+      "line": 164,
+      "code": "\t\t",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 165,
+      "code": "\t\t* 1c) determine firms' target percentiles; when noisy (i.e. ~normal), they may change across years",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "代码注释：1c) determine firms' target percentiles; when noisy (i.e. ~normal), they may change across years"
+    },
+    {
+      "line": 166,
+      "code": "\t\tuse \"peergroups\", clear",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 167,
+      "code": "\t\t\tkeep if inrange(fyear, 2007, 2008)",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 168,
+      "code": "\t\t\trename cik main_cik",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 169,
+      "code": "\t\t\tkeep main_cik ",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 170,
+      "code": "\t\t\tduplicates drop\t\t",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 171,
+      "code": "\t\t\tsort main_cik",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 172,
+      "code": "\t\t\t",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 173,
+      "code": "\t\t\tforvalues r=1(1)17 {",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 174,
+      "code": "\t\t\t\tlocal yr=2006+`r'",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "定义全局或局部宏，用于复用路径、变量列表、循环参数或输出名称。"
+    },
+    {
+      "line": 175,
+      "code": "\t\t\t\t",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 176,
+      "code": "\t\t\t\tif `pctl'>0 {",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 177,
+      "code": "\t\t\t\t\tdi \"`yr': Constant target percentile: `pctl'\"",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 178,
+      "code": "\t\t\t\t\tg target_pctl`yr'=`pctl'",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 179,
+      "code": "\t\t\t\t} ",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 180,
+      "code": "\t\t\t\telse if `pctl'==-1 {",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 181,
+      "code": "\t\t\t\t\tdi \"`yr': Target percentiles ~N(mu=50, sigma=12.5)\"",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 182,
+      "code": "\t\t\t\t\tg target_pctl`yr'=int(rnormal(50,12.5)) \t",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 183,
+      "code": "\t\t\t\t\treplace target_pctl`yr'=1  if target_pctl`yr'<1  & target_pctl`yr'!=.",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 184,
+      "code": "\t\t\t\t\treplace target_pctl`yr'=99 if target_pctl`yr'>99 & target_pctl`yr'!=.",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 185,
+      "code": "\t\t\t\t}\t\t",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 186,
+      "code": "\t\t\t\telse if `pctl'==-2 {",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 187,
+      "code": "\t\t\t\t\tdi \"`yr': Target percentiles ~N(mu=60, sigma=10)\"",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 188,
+      "code": "\t\t\t\t\tg target_pctl`yr'=int(rnormal(60,10)) \t",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 189,
+      "code": "\t\t\t\t\treplace target_pctl`yr'=1  if target_pctl`yr'<1  & target_pctl`yr'!=.",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 190,
+      "code": "\t\t\t\t\treplace target_pctl`yr'=99 if target_pctl`yr'>99 & target_pctl`yr'!=.",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 191,
+      "code": "\t\t\t\t}",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 192,
+      "code": "\t\t\t}",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 193,
+      "code": "\t",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 194,
+      "code": "\t\t\treshape long target_pctl, i(main_cik) j(fyear)",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "在宽表与长表之间转换，以便分位点、事件期或指标进入绘图和回归。"
+    },
+    {
+      "line": 195,
+      "code": "\t\tsave \"temp_target_percentiles\", replace",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 196,
+      "code": "\t\t",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 197,
+      "code": "\t\t",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 198,
+      "code": "\t\t*****************************************************************************************************************************************************",
+      "section": "Step 1: Preparations for the loop",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 199,
+      "code": "\t\t* Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "代码注释：Step 2: run years 2008-2023 in 模拟 where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round"
+    },
+    {
+      "line": 200,
+      "code": "\t\t*   (Note: peer group pay is pay in the PRIOR fiscal year, so we need to run it one period extra (i.e., \"2019\" to get peer group pay dispersion for 2018)",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "代码注释：(Note: peer group pay is pay in the PRIOR fiscal year, so we need to run it one period extra (i.e., \"2019\" to get peer group 薪酬离散度 for 2018)"
+    },
+    {
+      "line": 201,
+      "code": "\t\t*****************************************************************************************************************************************************",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 202,
+      "code": "\t\tclear",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "清空内存中的数据与估计结果，防止前序状态污染本次复现。"
+    },
+    {
+      "line": 203,
+      "code": "\t\tforvalues r=1(1)17 {",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 204,
+      "code": "\t\t\tlocal yr=2006+`r' ",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "定义全局或局部宏，用于复用路径、变量列表、循环参数或输出名称。"
+    },
+    {
+      "line": 205,
+      "code": "\t\t\tdi \"=== Running year `yr' ===\" ",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 206,
+      "code": "\t\t\t",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 207,
+      "code": "\t\t\t*** 2.A: Create ISS peergroups => file: peergroups-iss-methodology-`yr'",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "代码注释：2.A: Create ISS peergroups => file: peergroups-iss-methodology-`yr'"
+    },
+    {
+      "line": 208,
+      "code": "\t\t\tdi \" Creating ISS peer groups for `yr' (as per ISS methodology)...\"  ",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 209,
+      "code": "\t\t\tqui createISSpeergroups `yr'\t\t\t",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 210,
+      "code": "",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 211,
+      "code": "\t\t\t*** 2.B: Merge in peers' CEO pay levels from PRIOR YEAR",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "代码注释：2.B: 合并 in peers' CEO pay levels from PRIOR YEAR"
+    },
+    {
+      "line": 212,
+      "code": "\t\t\tdi \" Merging in peers' CEO pay levels from prior year\"  ",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 213,
+      "code": "\t\t\tuse \"peergroups-iss-methodology-`yr'\", clear\t\t",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 214,
+      "code": "\t\t\t\tcount\t\t\t\t\t\t",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 215,
+      "code": "\t\t\t\trename cik_2 cik",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 216,
+      "code": "\t\t\t\treplace fyear=fyear-1",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 217,
+      "code": "\t\t\t\tjoinby cik fyear using \"temp_compensation\", unmatched(master)",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 218,
+      "code": "\t\t\t\t\ttab  _merge",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 219,
+      "code": "\t\t\t\t\tdrop _merge",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 220,
+      "code": "\t\t\t\t\trename tdc1 peer_tdc1",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 221,
+      "code": "\t\t\t\t\treplace fyear=fyear+1",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 222,
+      "code": "\t\t\t\t\trename cik cik_2",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 223,
+      "code": "",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 224,
+      "code": "\t\t\t*** 2.C: Determine MAIN firms' new pay level this year (depending on target pctl)",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "代码注释：2.C: Determine MAIN firms' new pay level this year (depending on target pctl)"
+    },
+    {
+      "line": 225,
+      "code": "\t\t\tdi \" Determining main firms' new pay level this year (depending on their target percentiles)\"  ",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 226,
+      "code": "\t\t\tif `pctl'>-1 {",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 227,
+      "code": "\t\t\t\t* fixed target percentile ",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "代码注释：fixed target percentile"
+    },
+    {
+      "line": 228,
+      "code": "\t\t\t\tbys cik_1: egen temp=pctile(peer_tdc1), p(`pctl')",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 229,
+      "code": "\t\t\t\tbys cik_1: egen main_tdc1=min(temp)",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 230,
+      "code": "\t\t\t\tdrop temp",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 231,
+      "code": "\t\t\t} ",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 232,
+      "code": "\t\t\telse {",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 233,
+      "code": "\t\t\t\t* using the randomized target percentiles",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "代码注释：using the randomized target percentiles"
+    },
+    {
+      "line": 234,
+      "code": "\t\t\t\trename cik_1 main_cik",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 235,
+      "code": "\t\t\t\tjoinby main_cik fyear using \"temp_target_percentiles\"",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 236,
+      "code": "\t\t\t\trename main_cik cik_1",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 237,
+      "code": "\t\t\t\tg main_tdc1=.",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 238,
+      "code": "\t\t\t\tforvalues p=1(1)99 {",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 239,
+      "code": "\t\t\t\t\tdi \".\" _continue",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 240,
+      "code": "\t\t\t\t\tqui count if target_pctl==`p'",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 241,
+      "code": "\t\t\t\t\tif `r(N)' > 0 {",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 242,
+      "code": "\t\t\t\t\t\tqui bys cik_1: egen temp=pctile(peer_tdc1) if target_pctl==`p', p(`p')",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 243,
+      "code": "\t\t\t\t\t\tqui replace main_tdc1=temp if temp!=.",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 244,
+      "code": "\t\t\t\t\t\tqui drop temp",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 245,
+      "code": "\t\t\t\t\t}",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 246,
+      "code": "\t\t\t\t}",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 247,
+      "code": "\t\t\t\tdi \".\"",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 248,
+      "code": "\t\t\t}",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 249,
+      "code": "\t\t\t",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 250,
+      "code": "\t\t\t*** 2.D: compute new pay statistics",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "代码注释：2.D: compute new pay statistics"
+    },
+    {
+      "line": 251,
+      "code": "\t\t\tdi \"Saving pay dispersion statistics for `yr'\" \t\t\t\t\t",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 252,
+      "code": "\t\t\tpreserve",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "保存或恢复当前内存数据状态，使临时变换不会破坏主分析样本。"
+    },
+    {
+      "line": 253,
+      "code": "\t\t\t\tkeep cik_1 main_tdc1",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 254,
+      "code": "\t\t\t\tduplicates drop",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 255,
+      "code": "\t\t\t\tsumm main_tdc1, detail",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 256,
+      "code": "\t\t\t\t\tmatrix fyear     [`r',1]=`yr'",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "保存标量或矩阵结果，供后续显著性检验、表格统计量或循环调用。"
+    },
+    {
+      "line": 257,
+      "code": "\t\t\t\t\tmatrix fullSD    [`r',1]=`r(sd)'",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "保存标量或矩阵结果，供后续显著性检验、表格统计量或循环调用。"
+    },
+    {
+      "line": 258,
+      "code": "\t\t\t\t\tmatrix fullMedian[`r',1]=`r(p50)'",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "保存标量或矩阵结果，供后续显著性检验、表格统计量或循环调用。"
+    },
+    {
+      "line": 259,
+      "code": "\t\t\t\t\tmatrix fullMean  [`r',1]=`r(mean)'",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "保存标量或矩阵结果，供后续显著性检验、表格统计量或循环调用。"
+    },
+    {
+      "line": 260,
+      "code": "\t\t\t\t\tmatrix fullCV    [`r',1]=`r(sd)'/`r(p50)'",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "保存标量或矩阵结果，供后续显著性检验、表格统计量或循环调用。"
+    },
+    {
+      "line": 261,
+      "code": "\t\t\t\t\tmatrix fullN     [`r',1]=`r(N)'",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "保存标量或矩阵结果，供后续显著性检验、表格统计量或循环调用。"
+    },
+    {
+      "line": 262,
+      "code": "\t\t\trestore",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "保存或恢复当前内存数据状态，使临时变换不会破坏主分析样本。"
+    },
+    {
+      "line": 263,
+      "code": "\t\t\t\t\t",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 264,
+      "code": "\t\t\t*** 2.E: now append new pay of main firms to compensation file (so in next round, it can be matched in for the prior fiscal year)",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "代码注释：2.E: now append new pay of main firms to compensation file (so in next round, it can be matched in for the prior fiscal year)"
+    },
+    {
+      "line": 265,
+      "code": "\t\t\tdi \" Appending new pay levels to compensation file (so they can be used in the next round)\"  ",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 266,
+      "code": "\t\t\tpreserve",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "保存或恢复当前内存数据状态，使临时变换不会破坏主分析样本。"
+    },
+    {
+      "line": 267,
+      "code": "\t\t\t\tkeep cik_1 main_tdc1 ",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 268,
+      "code": "\t\t\t\tduplicates drop",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 269,
+      "code": "\t\t\t\trename cik_1 cik",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 270,
+      "code": "\t\t\t\trename main_tdc1 tdc1",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 271,
+      "code": "\t\t\t\tg fyear=`yr'",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 272,
+      "code": "\t\t\t\tappend using \"temp_compensation\"",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 273,
+      "code": "\t\t\t\tsort fyear cik",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 274,
+      "code": "\t\t\t\tsave \"temp_compensation\", replace",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 275,
+      "code": "\t\t\trestore\t",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "保存或恢复当前内存数据状态，使临时变换不会破坏主分析样本。"
+    },
+    {
+      "line": 276,
+      "code": "\t\t}",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 277,
+      "code": "\t\t",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 278,
+      "code": "\t\t",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 279,
+      "code": "\t\t****************************************************************************************************",
+      "section": "Step 2: run years 2008-2023 in simulation where CEO pay is updated to the pay target percentile of a firm's ISS peer group in each round",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 280,
+      "code": "\t\t*** Step 3: transform matrices into variables in a dataset and save results",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "代码注释：Step 3: transform matrices into variables in a dataset and save results"
+    },
+    {
+      "line": 281,
+      "code": "\t\t****************************************************************************************************",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 282,
+      "code": "\t\tclear",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "清空内存中的数据与估计结果，防止前序状态污染本次复现。"
+    },
+    {
+      "line": 283,
+      "code": "\t\tforeach v in fyear fullSD fullMedian fullMean fullCV fullN { ",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 284,
+      "code": "\t\t\tsvmat `v'",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 285,
+      "code": "\t\t\trename `v'1 `v'",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 286,
+      "code": "\t\t}",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 287,
+      "code": "\t\tkeep if !missing(fyear)",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 288,
+      "code": "\t\t",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 289,
+      "code": "\t\tg targetpctl=`pctl'",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 290,
+      "code": "\t\torder fyear targetpctl full* ",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 291,
+      "code": "\t\t*drop if fyear==2024",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "代码注释：drop if fyear==2024"
+    },
+    {
+      "line": 292,
+      "code": "",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 293,
+      "code": "\t\t* express median in percentages as of initial 2007 values",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "代码注释：express median in percentages as of initial 2007 values"
+    },
+    {
+      "line": 294,
+      "code": "\t\tg p_fullMedian=.",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 295,
+      "code": "\t\tg p_fullMean=.",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 296,
+      "code": "\t\tg p_fullCV=.",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 297,
+      "code": "\t\t\treplace p_fullMedian=fullMedian/fullMedian[1]",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 298,
+      "code": "\t\t\treplace p_fullMean=fullMean/fullMean[1]",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 299,
+      "code": "\t\t\treplace p_fullCV=fullCV/fullCV[1]",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 300,
+      "code": "\t\tsave \"sim`pctl'\", replace",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 301,
+      "code": "\tend",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 302,
+      "code": "\t*** END OF AUXILIARY PROGRAM ***************************************************************************************",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "代码注释：END OF AUXILIARY PROGRAM ***************************************************************************************"
+    },
+    {
+      "line": 303,
+      "code": "\t\t",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 304,
+      "code": "\t\t",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 305,
+      "code": "",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 306,
+      "code": "************************************************************************************************************************",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 307,
+      "code": "*** MAIN PROGRAM STARTS HERE",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "代码注释：MAIN PROGRAM STARTS HERE"
+    },
+    {
+      "line": 308,
+      "code": "************************************************************************************************************************",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 309,
+      "code": "",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 310,
+      "code": "",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 311,
+      "code": "\t********************************************************************************************************************",
+      "section": "Step 3: transform matrices into variables in a dataset and save results",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 312,
+      "code": "\t* Step 1: Start with some data preparations and with creating the universe of potential peers with firm data",
+      "section": "Step 1: Start with some data preparations and with creating the universe of potential peers with firm data",
+      "explanation": "代码注释：Step 1: Start with some data preparations and with creating the universe of potential peers with firm data"
+    },
+    {
+      "line": 313,
+      "code": "\t********************************************************************************************************************",
+      "section": "Step 1: Start with some data preparations and with creating the universe of potential peers with firm data",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 314,
+      "code": "\tunzipfile \"wrds/funda1990to2023.zip\", replace ",
+      "section": "Step 1: Start with some data preparations and with creating the universe of potential peers with firm data",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 315,
+      "code": "\tunzipfile \"wrds/firm_identifiers.zip\", replace\t",
+      "section": "Step 1: Start with some data preparations and with creating the universe of potential peers with firm data",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 316,
+      "code": "",
+      "section": "Step 1: Start with some data preparations and with creating the universe of potential peers with firm data",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 317,
+      "code": "\t* Step 1.A) Prepare firms' balance sheet data",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "代码注释：Step 1.A) Prepare firms' balance sheet data"
+    },
+    {
+      "line": 318,
+      "code": "\tuse \"funda1990to2023.dta\", clear",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 319,
+      "code": "\t\tkeep if upd==3 & final==\"Y\" & indfmt==\"INDL\" & datafmt==\"STD\" & consol==\"C\" & popsrc==\"D\" ",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 320,
+      "code": "\t\tdrop upd final indfmt datafmt consol popsrc conm curcd curncd",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 321,
+      "code": "\t\tdestring gvkey cik, replace",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 322,
+      "code": "\t\t\treplace txditc  = 0 if txditc==.",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 323,
+      "code": "\t\t\tg bkpstk\t\t= pstkrv",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 324,
+      "code": "\t\t\treplace bkpstk\t= pstkl if bkpstk==.",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 325,
+      "code": "\t\t\treplace bkpstk\t= upstk if bkpstk==.",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 326,
+      "code": "\t\t\tg bkequity\t\t= seq + txditc - bkpstk",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 327,
+      "code": "\t\t\tg mktcap \t\t= csho*prcc_f",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 328,
+      "code": "\t\t\tg mktval \t\t= at-bkequity+mktcap",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 329,
+      "code": "\t\t\tg q \t    \t= mktval/at",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 330,
+      "code": "\t\t\tgstats winsor q, by(fyear) cuts(0.001 99) replace",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 331,
+      "code": "",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 332,
+      "code": "\t\tkeep gvkey cik fyear revt at mktcap mktval q ",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 333,
+      "code": "\t\tduplicates drop",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 334,
+      "code": "\t\t\t\t",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 335,
+      "code": "\t\t* merge in GICS",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "代码注释：合并 in GICS"
+    },
+    {
+      "line": 336,
+      "code": "\t\tjoinby gvkey fyear using \"firm_identifiers\", unmatched (master)",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 337,
+      "code": "\t\t\ttab  _merge",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 338,
+      "code": "\t\t\tdrop _merge",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 339,
+      "code": "\t\t\treplace cik= cik_identifiers if cik==.",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 340,
+      "code": "\t\t\trename gics6_identifiers gics6",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 341,
+      "code": "\t\t\t*g name=upper(conm_identifiers)",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "代码注释：g name=upper(conm_identifiers)"
+    },
+    {
+      "line": 342,
+      "code": "\t\t\t* continue all on CIK (rather than gvkey)",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "代码注释：continue all on CIK (rather than gvkey)"
+    },
+    {
+      "line": 343,
+      "code": "\t\t\tdrop if cik==.",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 344,
+      "code": "\t\t\tdrop gvkey *_identifiers ",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 345,
+      "code": "\t\t",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 346,
+      "code": "\t\torder cik gics6 fyear revt at mktcap q",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 347,
+      "code": "\t\tduplicates drop",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 348,
+      "code": "\t\tkeep if inrange(fyear, 2007, 2023)\t\t",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 349,
+      "code": "\t\t* remove firms without GICS6 information (ISS peer group methodology needs GICS information)",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "代码注释：remove firms without GICS6 information (ISS peer group methodology needs GICS information)"
+    },
+    {
+      "line": 350,
+      "code": "\t\tkeep if gics6!=.",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 351,
+      "code": "\t\t* 13,222 unique companies",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "代码注释：13,222 unique companies"
+    },
+    {
+      "line": 352,
+      "code": "\t\tdistinct cik",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 353,
+      "code": "\t\torder fyear cik gics6 at revt mktcap q mktval ",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 354,
+      "code": "\tsave \"companies\", replace\t",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 355,
+      "code": "\t",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 356,
+      "code": "\t",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 357,
+      "code": "\t*** 1.B: Create universe of potential peers (very large temporary files-each one ~5GB)",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "代码注释：1.B: Create universe of potential peers (very large temporary files-each one ~5GB)"
+    },
+    {
+      "line": 358,
+      "code": "\tforvalues yr=2007(1)2023 {",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 359,
+      "code": "\t\tdi \"=== Creating `yr' universe of potential peers ===\"",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 360,
+      "code": "\t\tuse \"companies\", clear",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 361,
+      "code": "\t\t\tkeep if fyear==`yr'\t",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 362,
+      "code": "\t\t\tcount ",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 363,
+      "code": "\t\t\tsave \"temp\", replace",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 364,
+      "code": "\t\t\t",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 365,
+      "code": "\t\t\t* now merge with itself (>40m obs; ~2 min) ",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "代码注释：now 合并 with itself (>40m obs; ~2 min)"
+    },
+    {
+      "line": 366,
+      "code": "\t\t\tforeach v of varlist cik-mktval {",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 367,
+      "code": "\t\t\t\trename `v' `v'_1",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 368,
+      "code": "\t\t\t}",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 369,
+      "code": "\t\t\tjoinby fyear using \"temp\"",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 370,
+      "code": "\t\t\tforeach v1 of varlist * {",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 371,
+      "code": "\t\t\t\tforeach v2 of varlist `v1'* {",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 372,
+      "code": "\t\t\t\t\tif ustrcompare(\"`v1'\", \"`v2'\")!=0 {",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 373,
+      "code": "\t\t\t\t\t\trename `v1' `v1'_2",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 374,
+      "code": "\t\t\t\t\t}",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 375,
+      "code": "\t\t\t\t}",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 376,
+      "code": "\t\t\t}",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 377,
+      "code": "\t\t\tdrop if cik_1==cik_2 ",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 378,
+      "code": "\t\t\tcount",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 379,
+      "code": "\t\tsave \"_pairs-`yr'\", replace\t",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 380,
+      "code": "\t}",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 381,
+      "code": "\t* clean-up",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "代码注释：clean-up"
+    },
+    {
+      "line": 382,
+      "code": "\trm \"funda1990to2023.dta\"",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 383,
+      "code": "\trm \"companies.dta\"",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 384,
+      "code": "\trm \"temp.dta\"",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 385,
+      "code": "\t",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 386,
+      "code": "\t",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 387,
+      "code": "\t***********************************************************************************************",
+      "section": "Step 1.A) Prepare firms' balance sheet data",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 388,
+      "code": "\t* Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "section": "Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "explanation": "代码注释：Step 2: Run 模拟 (first paramater is the assumed target pay percentile"
+    },
+    {
+      "line": 389,
+      "code": "\t***********************************************************************************************",
+      "section": "Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 390,
+      "code": "\t",
+      "section": "Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 391,
+      "code": "\t* run simulation with randomized target percentiles (=-1 or -2) or with  fixed target percentiles: 40th, 50th, 60th, 70th, 75th, 80th",
+      "section": "Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "explanation": "代码注释：run 模拟 with randomized target percentiles (=-1 or -2) or with  fixed target percentiles: 40th, 50th, 60th, 70th, 75th, 80th"
+    },
+    {
+      "line": 392,
+      "code": "\tforeach p of numlist -1 -2 40 50 60 70 75 80 {",
+      "section": "Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 393,
+      "code": "\t\t",
+      "section": "Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 394,
+      "code": "\t\t* create output matrices",
+      "section": "Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "explanation": "代码注释：create output matrices"
+    },
+    {
+      "line": 395,
+      "code": "\t\tforeach v in fullSD fullMedian fullMean fullCV fullN fyear {",
+      "section": "Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 396,
+      "code": "\t\t\tmatrix `v' = J(25,1,.)  ",
+      "section": "Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "explanation": "保存标量或矩阵结果，供后续显著性检验、表格统计量或循环调用。"
+    },
+    {
+      "line": 397,
+      "code": "\t\t}\t\t",
+      "section": "Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 398,
+      "code": "\t",
+      "section": "Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 399,
+      "code": "\t\trunSimulation `p' ",
+      "section": "Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 400,
+      "code": "\t}",
+      "section": "Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 401,
+      "code": "\t",
+      "section": "Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 402,
+      "code": "\t***********************************************************************************************",
+      "section": "Step 2: Run simulation (first paramater is the assumed target pay percentile",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 403,
+      "code": "\t* Step 3: Merge all the simulation results into a single Stata file",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "代码注释：Step 3: 合并 all the 模拟 results into a single Stata file"
+    },
+    {
+      "line": 404,
+      "code": "\t***********************************************************************************************",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 405,
+      "code": "\tuse \"sim-1\", clear",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 406,
+      "code": "\t\tappend using \"sim-2\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 407,
+      "code": "\t\tappend using \"sim40\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 408,
+      "code": "\t\tappend using \"sim50\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 409,
+      "code": "\t\tappend using \"sim60\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 410,
+      "code": "\t\tappend using \"sim70\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 411,
+      "code": "\t\tappend using \"sim75\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 412,
+      "code": "\t\tappend using \"sim80\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 413,
+      "code": "\tsave \"simResults\", replace",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 414,
+      "code": "\t",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 415,
+      "code": "",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 416,
+      "code": "\t* clean-up",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "代码注释：clean-up"
+    },
+    {
+      "line": 417,
+      "code": "\trm \"temp_compensation.dta\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 418,
+      "code": "\trm \"temp_target_percentiles.dta\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 419,
+      "code": "\tforvalues yr=2007(1)2023{",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 420,
+      "code": "\t\tcap rm \"peergroups-iss-methodology-`yr'.dta\" ",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "捕获可能出现的错误，使删除旧文件或处理可选对象时脚本可以继续运行。"
+    },
+    {
+      "line": 421,
+      "code": "\t\tcap rm \"peergroups-iss-methodology-`yr'-extended.dta\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "捕获可能出现的错误，使删除旧文件或处理可选对象时脚本可以继续运行。"
+    },
+    {
+      "line": 422,
+      "code": "\t\tcap rm \"_pairs-`yr'.dta\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "捕获可能出现的错误，使删除旧文件或处理可选对象时脚本可以继续运行。"
+    },
+    {
+      "line": 423,
+      "code": "\t}",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 424,
+      "code": "\trm \"sim-1.dta\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 425,
+      "code": "\trm \"sim-2.dta\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 426,
+      "code": "\trm \"sim-3.dta\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 427,
+      "code": "\trm \"sim40.dta\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 428,
+      "code": "\trm \"sim50.dta\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 429,
+      "code": "\trm \"sim60.dta\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 430,
+      "code": "\trm \"sim70.dta\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 431,
+      "code": "\trm \"sim75.dta\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 432,
+      "code": "\trm \"sim80.dta\"",
+      "section": "Step 3: Merge all the simulation results into a single Stata file",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    }
+  ]
+}

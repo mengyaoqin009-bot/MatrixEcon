@@ -1,0 +1,23 @@
+		(1)	(2)	(3)	(4)	(5)	(6)	(7)	(8)
+VARIABLES	LABELS	sd_rel_at	sd_rel_at	sd_rel_mktval	sd_rel_mktval	frac_atypicalPeers	frac_atypicalPeers	frac_issPeers	frac_issPeers
+									
+t	t	0.000	0.000	0.001***	0.001***	-0.000	-0.000	0.000	0.000
+		(1.111)	(1.072)	(2.747)	(2.982)	(-0.657)	(-0.529)	(0.367)	(0.224)
+lag_log_at_real	lag_log_at_real		-0.000		-0.001		-0.000		-0.000
+			(-0.104)		(-0.640)		(-0.974)		(-0.572)
+lag_tobins_q	lag_tobins_q		0.001		0.000		0.000		-0.000
+			(0.500)		(0.166)		(0.532)		(-0.046)
+lag_sales_growth	lag_sales_growth		-0.008		0.001		0.001		0.001
+			(-1.468)		(0.114)		(0.555)		(1.434)
+lag_stock_ret_12m	lag_stock_ret_12m		0.005		0.005		-0.001		-0.000
+			(1.350)		(1.331)		(-1.240)		(-0.066)
+lag_idio_ret_vol_12m	lag_idio_ret_vol_12m		0.015		0.001		-0.001		-0.000
+			(1.451)		(0.132)		(-0.236)		(-0.015)
+Constant	Constant	1.160***	1.156***	1.217***	1.221***	0.443***	0.445***	0.286***	0.287***
+		(387.960)	(127.049)	(418.303)	(141.345)	(569.083)	(182.407)	(475.757)	(162.233)
+									
+Observations		370,169	368,268	370,169	368,268	370,169	368,268	370,169	368,268
+R-squared		0.000	0.007	0.000	0.007	0.000	0.007	0.000	0.007
+Firm controls		No	Yes	No	Yes	No	Yes	No	Yes
+Industry X Size FE		No	Yes	No	Yes	No	Yes	No	Yes
+Firm FE		No	Yes	No	Yes	No	Yes	No	Yes

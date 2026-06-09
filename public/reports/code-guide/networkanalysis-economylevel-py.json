@@ -1,0 +1,632 @@
+{
+  "file": "networkAnalysis-EconomyLevel.py",
+  "language": "Python",
+  "purpose": "计算总体经济网络指标",
+  "lineCount": 104,
+  "records": [
+    {
+      "line": 1,
+      "code": "\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"",
+      "section": "文件初始化",
+      "explanation": "模块文档字符串的边界或内容，用于说明网络指标、循环层级和输出文件。"
+    },
+    {
+      "line": 2,
+      "code": "Purpose:   Compute several network-based measures to illustrate that compensation networks are getting denser.",
+      "section": "文件初始化",
+      "explanation": "执行 Python 数据整理或网络统计语句，为 Figure 5、Table III 和附录网络分析生成输入。"
+    },
+    {
+      "line": 3,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 4,
+      "code": "    For each year between 2007 and 2023:",
+      "section": "文件初始化",
+      "explanation": "执行 Python 数据整理或网络统计语句，为 Figure 5、Table III 和附录网络分析生成输入。"
+    },
+    {
+      "line": 5,
+      "code": "        Compute the measures mentioned below",
+      "section": "文件初始化",
+      "explanation": "执行 Python 数据整理或网络统计语句，为 Figure 5、Table III 和附录网络分析生成输入。"
+    },
+    {
+      "line": 6,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 7,
+      "code": "    Network measures:",
+      "section": "文件初始化",
+      "explanation": "执行 Python 数据整理或网络统计语句，为 Figure 5、Table III 和附录网络分析生成输入。"
+    },
+    {
+      "line": 8,
+      "code": "        - Reciprocity: Fraction of existing edges that are bi-directional in directed graph",
+      "section": "文件初始化",
+      "explanation": "执行 Python 数据整理或网络统计语句，为 Figure 5、Table III 和附录网络分析生成输入。"
+    },
+    {
+      "line": 9,
+      "code": "        - Density: Fraction of all possible edges/vertices that exist in network.",
+      "section": "文件初始化",
+      "explanation": "执行 Python 数据整理或网络统计语句，为 Figure 5、Table III 和附录网络分析生成输入。"
+    },
+    {
+      "line": 10,
+      "code": "        - Graph transivity: the fraction of all possible triangles present in the graph",
+      "section": "文件初始化",
+      "explanation": "计算网络三角形数量，用于衡量同行选择关系的局部闭合程度。"
+    },
+    {
+      "line": 11,
+      "code": "        - Cluster coefficient: for a given node, it's the fraction of possible triangles through that node that exist. the cluster coefficient is the average of all nodes.",
+      "section": "文件初始化",
+      "explanation": "计算网络三角形数量，用于衡量同行选择关系的局部闭合程度。"
+    },
+    {
+      "line": 12,
+      "code": "        ",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 13,
+      "code": "    More information on network measures:",
+      "section": "文件初始化",
+      "explanation": "执行 Python 数据整理或网络统计语句，为 Figure 5、Table III 和附录网络分析生成输入。"
+    },
+    {
+      "line": 14,
+      "code": "        - https://networkx.github.io/documentation/networkx-1.9/reference/algorithms.clustering.html",
+      "section": "文件初始化",
+      "explanation": "计算平均聚类系数，衡量公司邻居之间彼此连接的倾向。"
+    },
+    {
+      "line": 15,
+      "code": "        ",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 16,
+      "code": "    Output: One CSV file \"networkAnalysis-Peergroup.csv\"",
+      "section": "文件初始化",
+      "explanation": "执行 Python 数据整理或网络统计语句，为 Figure 5、Table III 和附录网络分析生成输入。"
+    },
+    {
+      "line": 17,
+      "code": "        ",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 18,
+      "code": "Last update: Feb 2025",
+      "section": "文件初始化",
+      "explanation": "执行 Python 数据整理或网络统计语句，为 Figure 5、Table III 和附录网络分析生成输入。"
+    },
+    {
+      "line": 19,
+      "code": "\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"",
+      "section": "文件初始化",
+      "explanation": "模块文档字符串的边界或内容，用于说明网络指标、循环层级和输出文件。"
+    },
+    {
+      "line": 20,
+      "code": "import numpy as np",
+      "section": "文件初始化",
+      "explanation": "导入数据处理或网络分析库；核心依赖包括 pandas、NumPy 与 NetworkX。"
+    },
+    {
+      "line": 21,
+      "code": "import pandas as pd",
+      "section": "文件初始化",
+      "explanation": "导入数据处理或网络分析库；核心依赖包括 pandas、NumPy 与 NetworkX。"
+    },
+    {
+      "line": 22,
+      "code": "import networkx as nx",
+      "section": "文件初始化",
+      "explanation": "导入数据处理或网络分析库；核心依赖包括 pandas、NumPy 与 NetworkX。"
+    },
+    {
+      "line": 23,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 24,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 25,
+      "code": "def main():",
+      "section": "文件初始化",
+      "explanation": "定义主函数，把文件读取、网络构造、指标计算和输出封装为可执行流程。"
+    },
+    {
+      "line": 26,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 27,
+      "code": "    # prepare output file",
+      "section": "文件初始化",
+      "explanation": "代码注释：prepare output file"
+    },
+    {
+      "line": 28,
+      "code": "    csvFile=\"networkAnalysis-FullEconomy.csv\"",
+      "section": "文件初始化",
+      "explanation": "定义网络指标输出文件名，供 Stata 后续合并。"
+    },
+    {
+      "line": 29,
+      "code": "    f=open(csvFile, mode='w', encoding = 'utf-8')",
+      "section": "文件初始化",
+      "explanation": "以写入或追加模式打开 CSV 文件，并明确 UTF-8 编码。"
+    },
+    {
+      "line": 30,
+      "code": "    f.write(\"year,reciprocity,density,transitivity,triangles,clustering\\n\")",
+      "section": "文件初始化",
+      "explanation": "向 CSV 写入表头或当前网络的年份、公司、行业和指标值。"
+    },
+    {
+      "line": 31,
+      "code": "    f.close()",
+      "section": "文件初始化",
+      "explanation": "关闭文件句柄，确保缓冲区内容写入磁盘并释放资源。"
+    },
+    {
+      "line": 32,
+      "code": "    ",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 33,
+      "code": "    # read in Stata file ",
+      "section": "文件初始化",
+      "explanation": "代码注释：read in Stata file"
+    },
+    {
+      "line": 34,
+      "code": "    dfStatafile=pd.read_stata(\"peergroups.dta\")",
+      "section": "文件初始化",
+      "explanation": "读取 Stata 导出的同行关系数据或网络边列表。"
+    },
+    {
+      "line": 35,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 36,
+      "code": "    # Create empty directed graph to be used in the loop",
+      "section": "文件初始化",
+      "explanation": "代码注释：Create empty directed graph to be used in the loop"
+    },
+    {
+      "line": 37,
+      "code": "    dG=nx.DiGraph()",
+      "section": "文件初始化",
+      "explanation": "初始化有向或无向网络；公司是节点，薪酬同行关系是边。"
+    },
+    {
+      "line": 38,
+      "code": "    ",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 39,
+      "code": "    for yr in range(2007,2024):",
+      "section": "文件初始化",
+      "explanation": "启动循环，对年份、行业或核心公司的网络逐一计算指标。"
+    },
+    {
+      "line": 40,
+      "code": "        print(f\"\\n\\n===== {yr} =====\")",
+      "section": "文件初始化",
+      "explanation": "输出运行进度或诊断信息，便于定位耗时年份和异常网络。"
+    },
+    {
+      "line": 41,
+      "code": "        ",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 42,
+      "code": "        # Prepare data ",
+      "section": "文件初始化",
+      "explanation": "代码注释：Prepare data"
+    },
+    {
+      "line": 43,
+      "code": "        df=dfStatafile",
+      "section": "文件初始化",
+      "explanation": "创建或筛选 DataFrame，限定当前年份、行业或核心公司的网络样本。"
+    },
+    {
+      "line": 44,
+      "code": "        df=df[df.fyear==yr]",
+      "section": "文件初始化",
+      "explanation": "创建或筛选 DataFrame，限定当前年份、行业或核心公司的网络样本。"
+    },
+    {
+      "line": 45,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 46,
+      "code": "        # only keep ciks and peer ciks",
+      "section": "文件初始化",
+      "explanation": "代码注释：only keep ciks and peer ciks"
+    },
+    {
+      "line": 47,
+      "code": "        df=df.loc[:, [\"main_cik\", \"peer_cik\"]]  ",
+      "section": "文件初始化",
+      "explanation": "选择构建网络所需的核心公司与同行公司标识列。"
+    },
+    {
+      "line": 48,
+      "code": "        # check for null values in ciks and remove obs.",
+      "section": "文件初始化",
+      "explanation": "代码注释：check for null values in ciks and remove obs."
+    },
+    {
+      "line": 49,
+      "code": "        df=df[~df[\"main_cik\"].isnull()]                                         ",
+      "section": "文件初始化",
+      "explanation": "识别并删除公司标识缺失的边，防止无效节点进入网络。"
+    },
+    {
+      "line": 50,
+      "code": "        df=df[~df[\"main_cik\"].isnull()]",
+      "section": "文件初始化",
+      "explanation": "识别并删除公司标识缺失的边，防止无效节点进入网络。"
+    },
+    {
+      "line": 51,
+      "code": "        df=df[[\"main_cik\", \"peer_cik\"]].astype(np.int64)",
+      "section": "文件初始化",
+      "explanation": "把公司标识转换为整数，保证节点类型一致并减少浮点标识错误。"
+    },
+    {
+      "line": 52,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 53,
+      "code": "        # reset the graph from prior loop and fill it          ",
+      "section": "文件初始化",
+      "explanation": "代码注释：reset the graph from prior loop and fill it"
+    },
+    {
+      "line": 54,
+      "code": "        dG.clear()",
+      "section": "文件初始化",
+      "explanation": "清空上一轮循环的节点和边，避免不同年份、行业或公司网络相互污染。"
+    },
+    {
+      "line": 55,
+      "code": "        all_ciks=df.to_numpy()",
+      "section": "文件初始化",
+      "explanation": "把两列边列表转换为 NumPy 数组，供 NetworkX 循环添加边。"
+    },
+    {
+      "line": 56,
+      "code": "        for x, y in zip(all_ciks[:,0],all_ciks[:,1]):",
+      "section": "文件初始化",
+      "explanation": "启动循环，对年份、行业或核心公司的网络逐一计算指标。"
+    },
+    {
+      "line": 57,
+      "code": "            nx.add_path(dG, [x,y])",
+      "section": "文件初始化",
+      "explanation": "把核心公司指向薪酬同行公司的有向边加入网络。"
+    },
+    {
+      "line": 58,
+      "code": "        ",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 59,
+      "code": "        # compute reciprocity ",
+      "section": "文件初始化",
+      "explanation": "代码注释：compute reciprocity"
+    },
+    {
+      "line": 60,
+      "code": "        _reciprocity=-1",
+      "section": "文件初始化",
+      "explanation": "计算互惠性，即已存在连接中双向连接所占比例。"
+    },
+    {
+      "line": 61,
+      "code": "        try: _reciprocity=nx.reciprocity(dG)",
+      "section": "文件初始化",
+      "explanation": "计算互惠性，即已存在连接中双向连接所占比例。"
+    },
+    {
+      "line": 62,
+      "code": "        except: pass",
+      "section": "文件初始化",
+      "explanation": "捕获网络指标无法定义时的异常，保留预设缺失标记并继续循环。"
+    },
+    {
+      "line": 63,
+      "code": "        ",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 64,
+      "code": "        # compute density",
+      "section": "文件初始化",
+      "explanation": "代码注释：compute density"
+    },
+    {
+      "line": 65,
+      "code": "        _density=-1",
+      "section": "文件初始化",
+      "explanation": "计算网络密度，即实际边数相对于所有可能边数的比例。"
+    },
+    {
+      "line": 66,
+      "code": "        try: _density=nx.density(dG.to_undirected())",
+      "section": "文件初始化",
+      "explanation": "计算网络密度，即实际边数相对于所有可能边数的比例。"
+    },
+    {
+      "line": 67,
+      "code": "        except: pass",
+      "section": "文件初始化",
+      "explanation": "捕获网络指标无法定义时的异常，保留预设缺失标记并继续循环。"
+    },
+    {
+      "line": 68,
+      "code": "        if _density==0: _density=-1",
+      "section": "文件初始化",
+      "explanation": "计算网络密度，即实际边数相对于所有可能边数的比例。"
+    },
+    {
+      "line": 69,
+      "code": "        ",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 70,
+      "code": "        # compute transitivity",
+      "section": "文件初始化",
+      "explanation": "代码注释：compute transitivity"
+    },
+    {
+      "line": 71,
+      "code": "        _transitivity=-1",
+      "section": "文件初始化",
+      "explanation": "计算传递性，即闭合三角形相对于连通三元组的比例。"
+    },
+    {
+      "line": 72,
+      "code": "        try: _transitivity=nx.transitivity(dG) ",
+      "section": "文件初始化",
+      "explanation": "计算传递性，即闭合三角形相对于连通三元组的比例。"
+    },
+    {
+      "line": 73,
+      "code": "        except: pass",
+      "section": "文件初始化",
+      "explanation": "捕获网络指标无法定义时的异常，保留预设缺失标记并继续循环。"
+    },
+    {
+      "line": 74,
+      "code": "        if dG.number_of_edges()==0: _transitivity=-1",
+      "section": "文件初始化",
+      "explanation": "计算传递性，即闭合三角形相对于连通三元组的比例。"
+    },
+    {
+      "line": 75,
+      "code": "    ",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 76,
+      "code": "        # compute clustering coefficient",
+      "section": "文件初始化",
+      "explanation": "代码注释：compute clustering coefficient"
+    },
+    {
+      "line": 77,
+      "code": "        _clustering=-1",
+      "section": "文件初始化",
+      "explanation": "计算平均聚类系数，衡量公司邻居之间彼此连接的倾向。"
+    },
+    {
+      "line": 78,
+      "code": "        try: _clustering=nx.average_clustering(dG) ",
+      "section": "文件初始化",
+      "explanation": "计算平均聚类系数，衡量公司邻居之间彼此连接的倾向。"
+    },
+    {
+      "line": 79,
+      "code": "        except: pass",
+      "section": "文件初始化",
+      "explanation": "捕获网络指标无法定义时的异常，保留预设缺失标记并继续循环。"
+    },
+    {
+      "line": 80,
+      "code": "        if _clustering==0: _clustering=-1",
+      "section": "文件初始化",
+      "explanation": "计算平均聚类系数，衡量公司邻居之间彼此连接的倾向。"
+    },
+    {
+      "line": 81,
+      "code": "        ",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 82,
+      "code": "        # compute number of triangles",
+      "section": "文件初始化",
+      "explanation": "代码注释：compute number of triangles"
+    },
+    {
+      "line": 83,
+      "code": "        _triangles=-1",
+      "section": "文件初始化",
+      "explanation": "计算网络三角形数量，用于衡量同行选择关系的局部闭合程度。"
+    },
+    {
+      "line": 84,
+      "code": "        ltriangles=list(nx.triangles(dG.to_undirected()))",
+      "section": "文件初始化",
+      "explanation": "计算网络三角形数量，用于衡量同行选择关系的局部闭合程度。"
+    },
+    {
+      "line": 85,
+      "code": "        if len(ltriangles)>0: _triangles=np.nanmean(ltriangles)",
+      "section": "文件初始化",
+      "explanation": "计算网络三角形数量，用于衡量同行选择关系的局部闭合程度。"
+    },
+    {
+      "line": 86,
+      "code": "    ",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 87,
+      "code": "        print(f\"Reciprocity: {_reciprocity:6f}\")",
+      "section": "文件初始化",
+      "explanation": "计算互惠性，即已存在连接中双向连接所占比例。"
+    },
+    {
+      "line": 88,
+      "code": "        print(f\"Density: {_density:6f}\")",
+      "section": "文件初始化",
+      "explanation": "计算网络密度，即实际边数相对于所有可能边数的比例。"
+    },
+    {
+      "line": 89,
+      "code": "        print(f\"Transitivity: {_transitivity:6f}\")",
+      "section": "文件初始化",
+      "explanation": "计算传递性，即闭合三角形相对于连通三元组的比例。"
+    },
+    {
+      "line": 90,
+      "code": "        print(f\"Triangles: {_triangles:3f}\")",
+      "section": "文件初始化",
+      "explanation": "计算网络三角形数量，用于衡量同行选择关系的局部闭合程度。"
+    },
+    {
+      "line": 91,
+      "code": "        print(f\"Clustering: {_clustering:6f}\")",
+      "section": "文件初始化",
+      "explanation": "计算平均聚类系数，衡量公司邻居之间彼此连接的倾向。"
+    },
+    {
+      "line": 92,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 93,
+      "code": "        f=open(csvFile, mode=\"a\", encoding = 'utf-8')                   ",
+      "section": "文件初始化",
+      "explanation": "以写入或追加模式打开 CSV 文件，并明确 UTF-8 编码。"
+    },
+    {
+      "line": 94,
+      "code": "        f.write(str(yr) + \",\")",
+      "section": "文件初始化",
+      "explanation": "向 CSV 写入表头或当前网络的年份、公司、行业和指标值。"
+    },
+    {
+      "line": 95,
+      "code": "        f.write(str(_reciprocity) + \",\")",
+      "section": "文件初始化",
+      "explanation": "向 CSV 写入表头或当前网络的年份、公司、行业和指标值。"
+    },
+    {
+      "line": 96,
+      "code": "        f.write(str(_density) + \",\")",
+      "section": "文件初始化",
+      "explanation": "向 CSV 写入表头或当前网络的年份、公司、行业和指标值。"
+    },
+    {
+      "line": 97,
+      "code": "        f.write(str(_transitivity) + \",\")",
+      "section": "文件初始化",
+      "explanation": "向 CSV 写入表头或当前网络的年份、公司、行业和指标值。"
+    },
+    {
+      "line": 98,
+      "code": "        f.write(str(_triangles) + \",\")",
+      "section": "文件初始化",
+      "explanation": "向 CSV 写入表头或当前网络的年份、公司、行业和指标值。"
+    },
+    {
+      "line": 99,
+      "code": "        f.write(str(_clustering))",
+      "section": "文件初始化",
+      "explanation": "向 CSV 写入表头或当前网络的年份、公司、行业和指标值。"
+    },
+    {
+      "line": 100,
+      "code": "        f.write(\"\\n\")",
+      "section": "文件初始化",
+      "explanation": "向 CSV 写入表头或当前网络的年份、公司、行业和指标值。"
+    },
+    {
+      "line": 101,
+      "code": "        f.close()",
+      "section": "文件初始化",
+      "explanation": "关闭文件句柄，确保缓冲区内容写入磁盘并释放资源。"
+    },
+    {
+      "line": 102,
+      "code": "       ",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 Python 逻辑模块。"
+    },
+    {
+      "line": 103,
+      "code": "if __name__ == \"__main__\":",
+      "section": "文件初始化",
+      "explanation": "仅在脚本被直接运行时调用主函数，避免被其他模块导入时自动执行。"
+    },
+    {
+      "line": 104,
+      "code": "    main()",
+      "section": "文件初始化",
+      "explanation": "调用主函数，启动完整网络指标计算。"
+    }
+  ]
+}

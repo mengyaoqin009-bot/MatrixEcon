@@ -1,0 +1,24 @@
+	(1)	(2)	(3)	(4)	(5)	(6)
+VARIABLES	sd_GICS6_pay	sd_GICS6_abnpay	sd_GICS4_pay	sd_GICS4_abnpay	sd_GICS2_pay	sd_GICS2_abnpay
+						
+t	-0.002	-0.006*	0.001	-0.003	-0.002	0.001
+	(-0.361)	(-1.856)	(0.203)	(-1.192)	(-0.466)	(0.698)
+n_GICS6	-0.023	-0.038				
+	(-0.298)	(-0.685)				
+n_GICS6xt	0.004	0.003				
+	(0.837)	(1.003)				
+n_GICS4			-0.016	-0.050**		
+			(-0.595)	(-2.707)		
+n_GICS4xt			-0.000	0.002		
+			(-0.079)	(1.362)		
+n_GICS2					-0.014	0.000
+					(-1.448)	(0.045)
+n_GICS2xt					0.001	-0.000
+					(0.950)	(-0.673)
+Constant	2.786***	2.022***	3.055***	2.107***	3.005***	1.979***
+	(42.802)	(41.529)	(48.758)	(48.213)	(51.366)	(67.524)
+						
+Observations	1,928	1,928	1,928	1,928	1,928	1,928
+R-squared	0.036	0.033	0.012	0.014	0.007	0.003
+Industry FE	Yes	Yes	Yes	Yes	Yes	Yes
+Clustering	Industry	Industry	Industry	Industry	Industry	Industry

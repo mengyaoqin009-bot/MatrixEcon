@@ -1,0 +1,668 @@
+{
+  "file": "Stock return and volatility.sas",
+  "language": "SAS",
+  "purpose": "计算股票收益率、总波动率和特质波动率",
+  "lineCount": 110,
+  "records": [
+    {
+      "line": 1,
+      "code": "options ls=160  nocenter ;",
+      "section": "文件初始化",
+      "explanation": "设置 SAS 输出宽度、居中和远程通信选项。"
+    },
+    {
+      "line": 2,
+      "code": "%let wrds=wrds.wharton.upenn.edu 4016;",
+      "section": "文件初始化",
+      "explanation": "定义宏变量，例如 WRDS 地址、样本起止年份或循环参数。"
+    },
+    {
+      "line": 3,
+      "code": "options comamid=TCP remote=WRDS;",
+      "section": "文件初始化",
+      "explanation": "设置 SAS 输出宽度、居中和远程通信选项。"
+    },
+    {
+      "line": 4,
+      "code": "signon username=_prompt_;",
+      "section": "文件初始化",
+      "explanation": "建立、进入或结束 WRDS 远程 SAS 会话。"
+    },
+    {
+      "line": 5,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 6,
+      "code": "rsubmit;",
+      "section": "文件初始化",
+      "explanation": "建立、进入或结束 WRDS 远程 SAS 会话。"
+    },
+    {
+      "line": 7,
+      "code": "\tlibname ex '/sastemp7';",
+      "section": "文件初始化",
+      "explanation": "为 WRDS 数据库目录分配库引用，连接 Compustat、CRSP、CCM 和因子数据。"
+    },
+    {
+      "line": 8,
+      "code": "\tlibname comp '/wrds/comp/sasdata/d_na';",
+      "section": "文件初始化",
+      "explanation": "为 WRDS 数据库目录分配库引用，连接 Compustat、CRSP、CCM 和因子数据。"
+    },
+    {
+      "line": 9,
+      "code": "\tlibname ccm '/wrds/crsp/sasdata/a_ccm/';",
+      "section": "文件初始化",
+      "explanation": "为 WRDS 数据库目录分配库引用，连接 Compustat、CRSP、CCM 和因子数据。"
+    },
+    {
+      "line": 10,
+      "code": "\tlibname ret '/wrds/crsp/sasdata/a_stock';",
+      "section": "文件初始化",
+      "explanation": "为 WRDS 数据库目录分配库引用，连接 Compustat、CRSP、CCM 和因子数据。"
+    },
+    {
+      "line": 11,
+      "code": "\tlibname ff ' /wrds/ff/sasdata/ff_all';",
+      "section": "文件初始化",
+      "explanation": "为 WRDS 数据库目录分配库引用，连接 Compustat、CRSP、CCM 和因子数据。"
+    },
+    {
+      "line": 12,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 13,
+      "code": "\t%let beg_yr = 1994;",
+      "section": "文件初始化",
+      "explanation": "定义宏变量，例如 WRDS 地址、样本起止年份或循环参数。"
+    },
+    {
+      "line": 14,
+      "code": "\t%let end_yr = 2024;",
+      "section": "文件初始化",
+      "explanation": "定义宏变量，例如 WRDS 地址、样本起止年份或循环参数。"
+    },
+    {
+      "line": 15,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 16,
+      "code": "\tproc sql;",
+      "section": "文件初始化",
+      "explanation": "启动 SQL 过程，用于链接 CRSP、Compustat/CCM 并按公司年度聚合。"
+    },
+    {
+      "line": 17,
+      "code": "\t\tcreate table lnk as",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 18,
+      "code": "\t\t\tselect * from ccm.ccmxpf_linktable\t",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 19,
+      "code": "\t\t\twhere",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 20,
+      "code": "\t\t      linktype in (\"LU\", \"LC\", \"LD\", \"LF\", \"LN\", \"LO\", \"LS\", \"LX\") and",
+      "section": "文件初始化",
+      "explanation": "执行 SAS/WRDS 数据连接、收益率构造或波动率估计语句。"
+    },
+    {
+      "line": 21,
+      "code": "\t\t      (&end_yr+1 >= year(linkdt) or linkdt = .B) and  ",
+      "section": "文件初始化",
+      "explanation": "执行 SAS/WRDS 数据连接、收益率构造或波动率估计语句。"
+    },
+    {
+      "line": 22,
+      "code": "\t\t   \t  (&beg_yr-1 <= year(linkenddt) or linkenddt = .E) and",
+      "section": "文件初始化",
+      "explanation": "执行 SAS/WRDS 数据连接、收益率构造或波动率估计语句。"
+    },
+    {
+      "line": 23,
+      "code": "\t\t      linkprim in (\"P\", \"C\") ",
+      "section": "文件初始化",
+      "explanation": "执行 SAS/WRDS 数据连接、收益率构造或波动率估计语句。"
+    },
+    {
+      "line": 24,
+      "code": "\t\t\torder by gvkey, linkdt;",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 25,
+      "code": "\tquit;",
+      "section": "文件初始化",
+      "explanation": "结束当前 SAS 过程并提交执行。"
+    },
+    {
+      "line": 26,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 27,
+      "code": "\tproc sql; create table lnk as select distinct gvkey, lpermno, linkdt, linkenddt from lnk; quit;",
+      "section": "文件初始化",
+      "explanation": "启动 SQL 过程，用于链接 CRSP、Compustat/CCM 并按公司年度聚合。"
+    },
+    {
+      "line": 28,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 29,
+      "code": "\tdata lnk; set lnk; if linkenddt = \".E\" then linkenddt = \"31Dec2024\"D; run;",
+      "section": "文件初始化",
+      "explanation": "启动 DATA step，创建、追加或转换 SAS 数据集。"
+    },
+    {
+      "line": 30,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 31,
+      "code": "\tproc sql;",
+      "section": "文件初始化",
+      "explanation": "启动 SQL 过程，用于链接 CRSP、Compustat/CCM 并按公司年度聚合。"
+    },
+    {
+      "line": 32,
+      "code": "\t\tcreate table temp as",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 33,
+      "code": "\t\t\tselect distinct a.*, b.fyear,b.datadate",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 34,
+      "code": "\t\t\tfrom lnk as a, comp.funda as b",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 35,
+      "code": "\t\t\twhere a.gvkey=b.gvkey and a.linkdt<=b.datadate<=a.linkenddt",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 36,
+      "code": "\t\t\torder by gvkey, fyear, lpermno;",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 37,
+      "code": "\tquit;",
+      "section": "文件初始化",
+      "explanation": "结束当前 SAS 过程并提交执行。"
+    },
+    {
+      "line": 38,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 39,
+      "code": "\tproc sort data=temp; by gvkey fyear descending datadate; run;",
+      "section": "文件初始化",
+      "explanation": "按公司、证券和财年排序，为分组回归或去重选择做准备。"
+    },
+    {
+      "line": 40,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 41,
+      "code": "\t%macro loop;",
+      "section": "文件初始化",
+      "explanation": "定义、结束或调用年度循环宏，实现 1994–2024 年批量处理。"
+    },
+    {
+      "line": 42,
+      "code": "\t%do i=1994 %to 2024;",
+      "section": "文件初始化",
+      "explanation": "开始或结束 SAS 宏循环，对每个财年重复收益率与波动率计算。"
+    },
+    {
+      "line": 43,
+      "code": "\t\tdata temp&i; set temp; if fyear=&i; run;",
+      "section": "文件初始化",
+      "explanation": "启动 DATA step，创建、追加或转换 SAS 数据集。"
+    },
+    {
+      "line": 44,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 45,
+      "code": "\t\tproc sql;",
+      "section": "文件初始化",
+      "explanation": "启动 SQL 过程，用于链接 CRSP、Compustat/CCM 并按公司年度聚合。"
+    },
+    {
+      "line": 46,
+      "code": "\t\t\tcreate table ret_vol&i as",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 47,
+      "code": "\t\t\t\tselect distinct a.*,b.date, b.ret, mean(abs(b.prc)*b.shrout/1000) as mktequity, sqrt(252)* std(b.ret) as ret_vol_12m,",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 48,
+      "code": "\t\t\t\t\t\t\t\t    sum(log(1+b.ret)) as sum_log_ret",
+      "section": "文件初始化",
+      "explanation": "计算收益率或残差的均值、总量或标准差，形成年度收益和波动率指标。"
+    },
+    {
+      "line": 49,
+      "code": "\t\t\t\tfrom temp&i as a left join ret.dsf as b on a.lpermno=b.permno and a.datadate-366<=b.date<=a.datadate",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 50,
+      "code": "\t\t\t\tgroup by a.gvkey, a.lpermno;",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 51,
+      "code": "\t\tquit;",
+      "section": "文件初始化",
+      "explanation": "结束当前 SAS 过程并提交执行。"
+    },
+    {
+      "line": 52,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 53,
+      "code": "\t\tdata ret_vol&i (drop = sum_log_ret); set ret_vol&i; stock_ret_12m=exp(sum_log_ret)-1; run;",
+      "section": "文件初始化",
+      "explanation": "启动 DATA step，创建、追加或转换 SAS 数据集。"
+    },
+    {
+      "line": 54,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 55,
+      "code": "\t\tproc sql;",
+      "section": "文件初始化",
+      "explanation": "启动 SQL 过程，用于链接 CRSP、Compustat/CCM 并按公司年度聚合。"
+    },
+    {
+      "line": 56,
+      "code": "\t\t\tcreate table ret_vol&i as",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 57,
+      "code": "\t\t\tselect distinct a.*, b.rf,b.mktrf,b.smb,b.hml,b.umd",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 58,
+      "code": "\t\t\tfrom ret_vol&i as a left join ff.factors_daily as b on a.date=b.date;",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 59,
+      "code": "\t\tquit;",
+      "section": "文件初始化",
+      "explanation": "结束当前 SAS 过程并提交执行。"
+    },
+    {
+      "line": 60,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 61,
+      "code": "\t\tdata ret_vol&i; set ret_vol&i; exret=ret-rf; run;",
+      "section": "文件初始化",
+      "explanation": "启动 DATA step，创建、追加或转换 SAS 数据集。"
+    },
+    {
+      "line": 62,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 63,
+      "code": "\t\tproc reg data=ret_vol&i noprint;",
+      "section": "文件初始化",
+      "explanation": "启动分组时间序列回归，估计市场与因子模型。"
+    },
+    {
+      "line": 64,
+      "code": "\t\t\tby gvkey lpermno fyear;",
+      "section": "文件初始化",
+      "explanation": "要求回归或处理在每个公司—证券—财年组内分别执行。"
+    },
+    {
+      "line": 65,
+      "code": "\t\t\tmodel exret = mktrf smb hml umd;",
+      "section": "文件初始化",
+      "explanation": "定义超额收益对市场、SMB、HML 和动量因子的回归模型。"
+    },
+    {
+      "line": 66,
+      "code": "\t\t\toutput out = residuals r=residuals;",
+      "section": "文件初始化",
+      "explanation": "导出回归残差，用于计算特质收益波动率。"
+    },
+    {
+      "line": 67,
+      "code": "\t\tquit;",
+      "section": "文件初始化",
+      "explanation": "结束当前 SAS 过程并提交执行。"
+    },
+    {
+      "line": 68,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 69,
+      "code": "\t\tproc sql;",
+      "section": "文件初始化",
+      "explanation": "启动 SQL 过程，用于链接 CRSP、Compustat/CCM 并按公司年度聚合。"
+    },
+    {
+      "line": 70,
+      "code": "\t\t\tcreate table residuals_dist as",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 71,
+      "code": "\t\t\t\tselect distinct a.gvkey,a.lpermno, a.fyear, (sqrt(252)* std(residuals)) as idio_ret_vol_12m",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 72,
+      "code": "\t\t\t\tfrom residuals as a ",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 73,
+      "code": "\t\t\tgroup by gvkey, lpermno, fyear;",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 74,
+      "code": "\t\tquit;",
+      "section": "文件初始化",
+      "explanation": "结束当前 SAS 过程并提交执行。"
+    },
+    {
+      "line": 75,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 76,
+      "code": "\t\tproc sql; ",
+      "section": "文件初始化",
+      "explanation": "启动 SQL 过程，用于链接 CRSP、Compustat/CCM 并按公司年度聚合。"
+    },
+    {
+      "line": 77,
+      "code": "\t\t  \tcreate table ret_vol&i as",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 78,
+      "code": "\t\t  \t\tselect distinct a.gvkey,a.lpermno,a.fyear, a.mktequity, a.stock_ret_12m, a.ret_vol_12m, b.idio_ret_vol_12m",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 79,
+      "code": "\t\t  \t\tfrom ret_vol&i as a left join residuals_dist as b on a.gvkey = b.gvkey and a.lpermno = b.lpermno;",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 80,
+      "code": "\t\tquit;",
+      "section": "文件初始化",
+      "explanation": "结束当前 SAS 过程并提交执行。"
+    },
+    {
+      "line": 81,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 82,
+      "code": "\t\tdata ret_vol; set ret_vol ret_vol&i; run;",
+      "section": "文件初始化",
+      "explanation": "启动 DATA step，创建、追加或转换 SAS 数据集。"
+    },
+    {
+      "line": 83,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 84,
+      "code": "\t\tproc sql;",
+      "section": "文件初始化",
+      "explanation": "启动 SQL 过程，用于链接 CRSP、Compustat/CCM 并按公司年度聚合。"
+    },
+    {
+      "line": 85,
+      "code": "\t\t\tdrop table ret_vol&i;",
+      "section": "文件初始化",
+      "explanation": "删除年度循环产生的临时表，控制 WRDS 工作区存储占用。"
+    },
+    {
+      "line": 86,
+      "code": "\t\t\tdrop table residuals;",
+      "section": "文件初始化",
+      "explanation": "删除年度循环产生的临时表，控制 WRDS 工作区存储占用。"
+    },
+    {
+      "line": 87,
+      "code": "\t\t\tdrop table residuals_dist;",
+      "section": "文件初始化",
+      "explanation": "删除年度循环产生的临时表，控制 WRDS 工作区存储占用。"
+    },
+    {
+      "line": 88,
+      "code": "\t\tquit;",
+      "section": "文件初始化",
+      "explanation": "结束当前 SAS 过程并提交执行。"
+    },
+    {
+      "line": 89,
+      "code": "\t%end;",
+      "section": "文件初始化",
+      "explanation": "开始或结束 SAS 宏循环，对每个财年重复收益率与波动率计算。"
+    },
+    {
+      "line": 90,
+      "code": "\t%mend;",
+      "section": "文件初始化",
+      "explanation": "定义、结束或调用年度循环宏，实现 1994–2024 年批量处理。"
+    },
+    {
+      "line": 91,
+      "code": "\t%loop;",
+      "section": "文件初始化",
+      "explanation": "定义、结束或调用年度循环宏，实现 1994–2024 年批量处理。"
+    },
+    {
+      "line": 92,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 93,
+      "code": "\tproc download data=ret_vol out=ret_vol; quit;",
+      "section": "文件初始化",
+      "explanation": "把 WRDS 远程会话中的结果下载到本地 SAS 环境。"
+    },
+    {
+      "line": 94,
+      "code": "endrsubmit;",
+      "section": "文件初始化",
+      "explanation": "建立、进入或结束 WRDS 远程 SAS 会话。"
+    },
+    {
+      "line": 95,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 96,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 97,
+      "code": "proc sql;",
+      "section": "文件初始化",
+      "explanation": "启动 SQL 过程，用于链接 CRSP、Compustat/CCM 并按公司年度聚合。"
+    },
+    {
+      "line": 98,
+      "code": "\tcreate table ret_vol as",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 99,
+      "code": "\t\tselect distinct a.gvkey,a.fyear, sum(a.mktequity) as mktequity,",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 100,
+      "code": "\t\t\t\t\t\t\t\tmean(a.stock_ret_12m) as stock_ret_12m,",
+      "section": "文件初始化",
+      "explanation": "计算收益率或残差的均值、总量或标准差，形成年度收益和波动率指标。"
+    },
+    {
+      "line": 101,
+      "code": "\t\t\t\t\t\t\t\tmean(a.ret_vol_12m) as ret_vol_12m,",
+      "section": "文件初始化",
+      "explanation": "计算收益率或残差的均值、总量或标准差，形成年度收益和波动率指标。"
+    },
+    {
+      "line": 102,
+      "code": "\t\t\t\t\t\t\t\tmean(a.idio_ret_vol_12m) as idio_ret_vol_12m",
+      "section": "文件初始化",
+      "explanation": "计算收益率或残差的均值、总量或标准差，形成年度收益和波动率指标。"
+    },
+    {
+      "line": 103,
+      "code": "\t\tfrom ret_vol as a ",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 104,
+      "code": "\t\tgroup by a.gvkey,a.fyear;",
+      "section": "文件初始化",
+      "explanation": "SQL 查询语句：选择字段、连接数据库表、限制样本并定义公司年度聚合层级。"
+    },
+    {
+      "line": 105,
+      "code": "quit;",
+      "section": "文件初始化",
+      "explanation": "结束当前 SAS 过程并提交执行。"
+    },
+    {
+      "line": 106,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 107,
+      "code": "data ret_vol; set ret_vol; gvkey_num=gvkey*1; drop gvkey;     run;",
+      "section": "文件初始化",
+      "explanation": "启动 DATA step，创建、追加或转换 SAS 数据集。"
+    },
+    {
+      "line": 108,
+      "code": "data ret_vol; set ret_vol; gvkey = gvkey_num; drop gvkey_num; run;",
+      "section": "文件初始化",
+      "explanation": "启动 DATA step，创建、追加或转换 SAS 数据集。"
+    },
+    {
+      "line": 109,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔 SAS 数据与回归模块。"
+    },
+    {
+      "line": 110,
+      "code": "proc export data=ret_vol_fyear outfile = \"ret_vol_fyear\" dbms=dta replace; quit;",
+      "section": "文件初始化",
+      "explanation": "把最终公司年度结果导出为 Stata 数据集，供 `prepare-data.do` 合并。"
+    }
+  ]
+}

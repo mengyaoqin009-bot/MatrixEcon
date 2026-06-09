@@ -1,0 +1,30 @@
+		(1)	(2)	(3)	(4)
+VARIABLES	LABELS	sd_mom_ceopay_econ	sd_mom_ceopay_econ	sd_mom_abn_ceopay_econ	sd_mom_abn_ceopay_econ
+					
+weakvote	weakvote	-0.033	-0.052	0.015	-0.029
+		(-0.444)	(-0.547)	(0.256)	(-0.394)
+weakvoteXpost1	weakvoteXpost1	0.099	0.302*	-0.011	-0.160
+		(0.708)	(1.774)	(-0.107)	(-1.118)
+weakvoteXpost2	weakvoteXpost2	0.028	0.045	0.047	-0.033
+		(0.191)	(0.242)	(0.409)	(-0.229)
+weakvoteXpost3	weakvoteXpost3	0.024	0.085	-0.106	-0.286**
+		(0.154)	(0.460)	(-0.922)	(-2.162)
+lag_log_at	lag_log_at		0.027		-0.013
+			(0.942)		(-0.655)
+lag_tobins_q	lag_tobins_q		0.046		-0.006
+			(0.941)		(-0.155)
+lag_sales_growth	lag_sales_growth		-0.389*		0.093
+			(-1.798)		(0.563)
+lag_stock_ret_12m	lag_stock_ret_12m		-0.069		-0.077
+			(-0.649)		(-1.001)
+lag_idio_ret_vol_12m	lag_idio_ret_vol_12m		0.327		0.132
+			(1.021)		(0.575)
+Constant	Constant	3.015***	2.637***	2.572***	2.700***
+		(59.898)	(9.448)	(71.251)	(13.891)
+					
+Observations		2,117	2,007	2,117	2,007
+R-squared		0.000	0.338	0.001	0.333
+Firm controls		No	Yes	No	Yes
+Year FE		Yes	Yes	Yes	Yes
+Firm FE		No	Yes	No	Yes
+# of firms		349	347	349	347

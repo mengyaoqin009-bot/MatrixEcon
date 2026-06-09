@@ -1,0 +1,1886 @@
+{
+  "file": "issInfluence.do",
+  "language": "Stata",
+  "purpose": "构造机构投资者追随 ISS 建议的指标",
+  "lineCount": 313,
+  "records": [
+    {
+      "line": 1,
+      "code": "**********************************************************************************************************************************",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 2,
+      "code": "* Purpose: compute for each firm, how many of its investors are overwhelmingly simply following ISS recommendations.",
+      "section": "文件初始化",
+      "explanation": "代码注释：Purpose: compute for each firm, how many of its investors are overwhelmingly simply following ISS recommendations."
+    },
+    {
+      "line": 3,
+      "code": "*",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 4,
+      "code": "* To do so:",
+      "section": "文件初始化",
+      "explanation": "代码注释：To do so:"
+    },
+    {
+      "line": 5,
+      "code": "*   1. Match ISS-NPX voting data with TR holdings data (using the ISS-TR-linktable that was created in the SAS file). ",
+      "section": "文件初始化",
+      "explanation": "代码注释：1. Match ISS-NPX voting data with TR holdings data (using the ISS-TR-link表 that was created in the SAS file)."
+    },
+    {
+      "line": 6,
+      "code": "*      Then compute how often a given mutual fund investor follows the ISS's recommendation. ",
+      "section": "文件初始化",
+      "explanation": "代码注释：Then compute how often a given mutual fund investor follows the ISS's recommendation."
+    },
+    {
+      "line": 7,
+      "code": "*   2. For each firm's annual meeting, get the last disclosed holdings of all of its investors. ",
+      "section": "文件初始化",
+      "explanation": "代码注释：2. For each firm's annual meeting, get the last disclosed holdings of all of its investors."
+    },
+    {
+      "line": 8,
+      "code": "*   3. Finally merge in investors' propensity to vote with ISS [created in step 1] and weight it by the size of their holdings.",
+      "section": "文件初始化",
+      "explanation": "代码注释：3. Finally 合并 in investors' propensity to vote with ISS [created in step 1] and weight it by the size of their holdings."
+    },
+    {
+      "line": 9,
+      "code": "**********************************************************************************************************************************",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 10,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 11,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 12,
+      "code": "***********************************************************************************",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 13,
+      "code": "* Step 1: For each mutual fund, compute the propensity to vote with ISS.\t",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "代码注释：Step 1: For each mutual fund, compute the propensity to vote with ISS."
+    },
+    {
+      "line": 14,
+      "code": "***********************************************************************************",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 15,
+      "code": "\t",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 16,
+      "code": "\t* can only do till 2017 since ISS file only goes till then",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "代码注释：can only do till 2017 since ISS file only goes till then"
+    },
+    {
+      "line": 17,
+      "code": "\tunzipfile \"wrds/recs_2005_2023.zip\", replace",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 18,
+      "code": "\tunzipfile \"wrds/iss_mutual_fund_voting_2007to2018.zip\", replace",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 19,
+      "code": "\tunzipfile \"wrds/iss_votinganalytics_vote_results_2003to2017.zip\", replace",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 20,
+      "code": "\t",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 21,
+      "code": "\tforvalues y=2007(1)2017 {",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 22,
+      "code": "\t\tunzipfile \"voteanalysis_npx_`y'.zip\", replace",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 23,
+      "code": "\t\tuse \"voteanalysis_npx_`y'\", clear ",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 24,
+      "code": "\t\tkeep if countryofinc==\"USA\"",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 25,
+      "code": "\t\t",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 26,
+      "code": "\t\t* in <5 percent of cases funds give several votes",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "代码注释：in <5 percent of cases funds give several votes"
+    },
+    {
+      "line": 27,
+      "code": "\t\tbys fundid itemonagendaid: egen multipleVotes=count(fundid)",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "在指定分组内计数或标记唯一观测，用于样本量、公司数或同行数量。"
+    },
+    {
+      "line": 28,
+      "code": "\t\ttab multipleVotes",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 29,
+      "code": "\t\tdrop if multipleVotes>1",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 30,
+      "code": "\t\t",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 31,
+      "code": "\t\t* merge in ISS vote recommendations",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "代码注释：合并 in ISS vote recommendations"
+    },
+    {
+      "line": 32,
+      "code": "\t\tjoinby itemonagendaid using \"recs_2005_2023\", unmatched(master)",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 33,
+      "code": "\t\t\ttab  _merge",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 34,
+      "code": "\t\t\tdrop _merge",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 35,
+      "code": "\t\t\tdrop prob_gl_1 prob_iss_1 rec_gl prop_N",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 36,
+      "code": "\t\t\tg issrec=\"\"",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 37,
+      "code": "\t\t\t\treplace issrec=\"FOR\"     if rec_iss==1",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 38,
+      "code": "\t\t\t\treplace issrec=\"AGAINST\" if rec_iss==0",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 39,
+      "code": "\t\t",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 40,
+      "code": "\t\t* merge in vote results",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "代码注释：合并 in vote results"
+    },
+    {
+      "line": 41,
+      "code": "\t\tjoinby itemonagendaid using \"iss_votinganalytics_vote_results_2003to2017\", unmatched(master)",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 42,
+      "code": "\t\t\ttab  _merge",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 43,
+      "code": "\t\t\tdrop _merge",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 44,
+      "code": "\t\t\treplace mgmtrec=upper(mgmtrec)",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 45,
+      "code": "\t\t\treplace fundvote=upper(fundvote)",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 46,
+      "code": "",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 47,
+      "code": "\t\t* compute votes",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "代码注释：compute votes"
+    },
+    {
+      "line": 48,
+      "code": "\t\tg forVote=.",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 49,
+      "code": "\t\t\treplace forVote=votedfor/(votedfor+votedagainst) if base==\"F+A\"",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 50,
+      "code": "\t\t\treplace forVote=votedfor/(votedfor+votedagainst+votedabstain) if base==\"F+A+AB\"",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 51,
+      "code": "\t\tg passingMargin=voterequirement-forVote",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 52,
+      "code": "\t\t",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 53,
+      "code": "\t\tkeep institutionid fundid companyid companyname cusip securityid meetingid meetingdate issagendaitemid itemonagendaid mgmtrec issrec fundvote forVote passingMargin",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 54,
+      "code": "",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 55,
+      "code": "",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 56,
+      "code": "\t\t* measure 1: fraction of votes when fund vote agrees with ISS recommendation",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "代码注释：measure 1: fraction of votes when fund vote agrees with ISS recommendation"
+    },
+    {
+      "line": 57,
+      "code": "\t\tg withISS=.",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 58,
+      "code": "\t\t\treplace withISS=0 if fundvote!=issrec & inlist(fundvote, \"ABSTAIN\", \"AGAINST\", \"FOR\", \"WITHHOLD\") & inlist(issrec, \"AGAINST\", \"FOR\", \"WITHHOLD\")",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 59,
+      "code": "\t\t\treplace withISS=1 if fundvote==issrec & inlist(fundvote, \"ABSTAIN\", \"AGAINST\", \"FOR\", \"WITHHOLD\") & inlist(issrec, \"AGAINST\", \"FOR\", \"WITHHOLD\")",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 60,
+      "code": "\t\tbys institutionid fundid: egen sum_fundWithISS=sum(withISS)",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "在指定分组内计算均值或总量，用于年度聚合、持股比例或同行群体统计。"
+    },
+    {
+      "line": 61,
+      "code": "\t\tbys institutionid fundid: egen n_fundWithISS=count(withISS)",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "在指定分组内计数或标记唯一观测，用于样本量、公司数或同行数量。"
+    },
+    {
+      "line": 62,
+      "code": "\t\tg frac_fundWithISS_ver1=sum_fundWithISS/n_fundWithISS",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 63,
+      "code": "\t\t",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 64,
+      "code": "\t\t* measure 2: fraction of votes when fund vote agrees with ISS recommendation CONDITIONAL ON MGMT DISAGREEING WITH ISS",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "代码注释：measure 2: fraction of votes when fund vote agrees with ISS recommendation CONDITIONAL ON MGMT DISAGREEING WITH ISS"
+    },
+    {
+      "line": 65,
+      "code": "\t\tg withISS2=.",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 66,
+      "code": "\t\t\treplace withISS2=0 if mgmtrec!=issrec & fundvote!=issrec & inlist(fundvote, \"ABSTAIN\", \"AGAINST\", \"FOR\", \"WITHHOLD\") & inlist(issrec, \"AGAINST\", \"FOR\", \"WITHHOLD\")",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 67,
+      "code": "\t\t\treplace withISS2=1 if mgmtrec!=issrec & fundvote==issrec & inlist(fundvote, \"ABSTAIN\", \"AGAINST\", \"FOR\", \"WITHHOLD\") & inlist(issrec, \"AGAINST\", \"FOR\", \"WITHHOLD\")",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 68,
+      "code": "\t\tbys institutionid fundid: egen sum_fundWithISS2=sum(withISS2)",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "在指定分组内计算均值或总量，用于年度聚合、持股比例或同行群体统计。"
+    },
+    {
+      "line": 69,
+      "code": "\t\tbys institutionid fundid: egen n_fundWithISS2=count(withISS2)",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "在指定分组内计数或标记唯一观测，用于样本量、公司数或同行数量。"
+    },
+    {
+      "line": 70,
+      "code": "\t\tg frac_fundWithISS_ver2=sum_fundWithISS2/n_fundWithISS2",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 71,
+      "code": "",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 72,
+      "code": "\t\t* FILE 1: Save company's meetingdate (so that we can get funds' most recent investment in next step)",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "代码注释：FILE 1: Save company's meetingdate (so that we can get funds' most recent investment in next step)"
+    },
+    {
+      "line": 73,
+      "code": "\t\tpreserve",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保存或恢复当前内存数据状态，使临时变换不会破坏主分析样本。"
+    },
+    {
+      "line": 74,
+      "code": "\t\t\tkeep companyid companyname cusip securityid meetingdate ",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 75,
+      "code": "\t\t\tduplicates drop",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 76,
+      "code": "\t\t\tcompress",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "压缩变量存储类型，在不改变数值的前提下降低大型数据集内存占用。"
+    },
+    {
+      "line": 77,
+      "code": "\t\t\tsave companyMeetings_`y', replace",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 78,
+      "code": "\t\trestore",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保存或恢复当前内存数据状态，使临时变换不会破坏主分析样本。"
+    },
+    {
+      "line": 79,
+      "code": "\t\t",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 80,
+      "code": "\t\t* FILE 2: Save institution's and fund's propensity to vote with ISS",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "代码注释：FILE 2: Save institution's and fund's propensity to vote with ISS"
+    },
+    {
+      "line": 81,
+      "code": "\t\tpreserve",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保存或恢复当前内存数据状态，使临时变换不会破坏主分析样本。"
+    },
+    {
+      "line": 82,
+      "code": "\t\t\tkeep institutionid fundid frac_fundWithISS_ver1 frac_fundWithISS_ver2",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 83,
+      "code": "\t\t\tduplicates drop",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 84,
+      "code": "\t\t\t",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 85,
+      "code": "\t\t\t* finalize",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "代码注释：finalize"
+    },
+    {
+      "line": 86,
+      "code": "\t\t\tg year=`y'",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 87,
+      "code": "\t\t\trename institutionid iss_institutionid",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 88,
+      "code": "\t\t\trename fundid iss_fundid",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 89,
+      "code": "\t\t\torder year iss_institutionid iss_fundid",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 90,
+      "code": "\t\t\tsort  year iss_institutionid iss_fundid",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 91,
+      "code": "\t\t\t",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 92,
+      "code": "\t\t\tcompress",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "压缩变量存储类型，在不改变数值的前提下降低大型数据集内存占用。"
+    },
+    {
+      "line": 93,
+      "code": "\t\t\tsave propVotingWithISS_`y', replace",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 94,
+      "code": "\t\trestore",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保存或恢复当前内存数据状态，使临时变换不会破坏主分析样本。"
+    },
+    {
+      "line": 95,
+      "code": "\t}",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 96,
+      "code": "",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 97,
+      "code": "\t* Append annual files",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "代码注释：Append annual files"
+    },
+    {
+      "line": 98,
+      "code": "\tuse \"propVotingWithISS_2007\", clear",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 99,
+      "code": "\trm \"propVotingWithISS_2007.dta\"",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 100,
+      "code": "\tforvalues y=2008(1)2017 {",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 101,
+      "code": "\t\tappend using \"propVotingWithISS_`y'\"",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 102,
+      "code": "\t\trm \"propVotingWithISS_`y'.dta\"",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 103,
+      "code": "\t}",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 104,
+      "code": "\tsort iss_institutionid iss_fundid year",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 105,
+      "code": "\torder iss_institutionid iss_fundid year",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 106,
+      "code": "\tsave \"propVotingWithISS\", replace",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 107,
+      "code": "",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 108,
+      "code": "\tuse \"companyMeetings_2007\", clear",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 109,
+      "code": "\trm \"companyMeetings_2007.dta\"",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 110,
+      "code": "\tforvalues y=2008(1)2017 {",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 111,
+      "code": "\t\tappend using \"companyMeetings_`y'\"",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 112,
+      "code": "\t\trm \"companyMeetings_`y'.dta\"",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 113,
+      "code": "\t}",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 114,
+      "code": "\tsort companyid meetingdate",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 115,
+      "code": "\tsave \"companyMeetings\", replace",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 116,
+      "code": "",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 117,
+      "code": "",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 118,
+      "code": "",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 119,
+      "code": "**************************************************************************************",
+      "section": "Step 1: For each mutual fund, compute the propensity to vote with ISS.",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 120,
+      "code": "* Step 2. For each firm's annual meeting, get the last disclosed holdings ",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "代码注释：Step 2. For each firm's annual meeting, get the last disclosed holdings"
+    },
+    {
+      "line": 121,
+      "code": "*   of all of its investors. Then merge in investors' propensity to vote ",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "代码注释：of all of its investors. Then 合并 in investors' propensity to vote"
+    },
+    {
+      "line": 122,
+      "code": "*   with ISS [created in step 1] and weight it by the size of their holdings.",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "代码注释：with ISS [created in step 1] and weight it by the size of their holdings."
+    },
+    {
+      "line": 123,
+      "code": "**************************************************************************************",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 124,
+      "code": "",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 125,
+      "code": "\t* prepare TR holdings file",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "代码注释：prepare TR holdings file"
+    },
+    {
+      "line": 126,
+      "code": "\tunzipfile \"wrds/s12_2007to2023.zip\", replace",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 127,
+      "code": "\tuse \"s12_2007to2023\", clear",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 128,
+      "code": "\t\tkeep if inrange(year(rdate), 2007, 2017)",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 129,
+      "code": "\t\tg shrout=shrout1*1000000",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 130,
+      "code": "\t\treplace shrout=shrout2*1000 if shrout==.",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 131,
+      "code": "\t\tkeep fundno rdate cusip ticker shares prc shrout",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 132,
+      "code": "\t\tg cusip6=substr(cusip,1,6)",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 133,
+      "code": "\t\tg year=year(rdate)",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 134,
+      "code": "\tcompress",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "压缩变量存储类型，在不改变数值的前提下降低大型数据集内存占用。"
+    },
+    {
+      "line": 135,
+      "code": "\tsave \"tempHoldings\", replace",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 136,
+      "code": "\trm \"s12_2007to2023.dta\"",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 137,
+      "code": "\t\t",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 138,
+      "code": "\t* For a given year and company, get its meeting date and merge in the most recent fund holdings",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "代码注释：For a given year and company, get its meeting date and 合并 in the most recent fund holdings"
+    },
+    {
+      "line": 139,
+      "code": "\tforvalues y=2007(1)2017 {",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 140,
+      "code": "",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 141,
+      "code": "\t\tuse \"companyMeetings\", clear",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 142,
+      "code": "\t\t\treplace cusip=securityid if cusip==\"\"",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 143,
+      "code": "\t\t\tg cusip6=substr(cusip,1,6)",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 144,
+      "code": "\t\t\tdrop cusip securityid",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 145,
+      "code": "\t\t\tg year=year(meetingdate)",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 146,
+      "code": "\t\t\tkeep if year==`y'",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 147,
+      "code": "\t\t\t",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 148,
+      "code": "\t\t\t* merge it twice - the current year and the previous year (because some meetings are in January and we would want the holding as of 31DEC of the previous year)",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "代码注释：合并 it twice - the current year and the previous year (because some meetings are in January and we would want the holding as of 31DEC of the previous year)"
+    },
+    {
+      "line": 149,
+      "code": "\t\t\tpreserve",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保存或恢复当前内存数据状态，使临时变换不会破坏主分析样本。"
+    },
+    {
+      "line": 150,
+      "code": "\t\t\t\tjoinby cusip6 year using \"tempHoldings\", unmatched(master)",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 151,
+      "code": "\t\t\t\t\ttab  _merge",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 152,
+      "code": "\t\t\t\t\tdrop _merge",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 153,
+      "code": "\t\t\t\t\tcount",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 154,
+      "code": "\t\t\t\tsave \"temp1\", replace",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 155,
+      "code": "\t\t\trestore",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保存或恢复当前内存数据状态，使临时变换不会破坏主分析样本。"
+    },
+    {
+      "line": 156,
+      "code": "\t\t\tpreserve",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保存或恢复当前内存数据状态，使临时变换不会破坏主分析样本。"
+    },
+    {
+      "line": 157,
+      "code": "\t\t\t\treplace year=year-1",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 158,
+      "code": "\t\t\t\tjoinby cusip6 year using \"tempHoldings\", unmatched(master)",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 159,
+      "code": "\t\t\t\t\ttab  _merge",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 160,
+      "code": "\t\t\t\t\tdrop _merge",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 161,
+      "code": "\t\t\t\t\tcount",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 162,
+      "code": "\t\t\t\tsave \"temp2\", replace",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 163,
+      "code": "\t\t\trestore",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保存或恢复当前内存数据状态，使临时变换不会破坏主分析样本。"
+    },
+    {
+      "line": 164,
+      "code": "\t\t\t",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 165,
+      "code": "\t\t\tuse \"temp1\", clear",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 166,
+      "code": "\t\t\tappend using \"temp2\"",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 167,
+      "code": "\t\t\t\trm \"temp1.dta\"",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 168,
+      "code": "\t\t\t\trm \"temp2.dta\"",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 169,
+      "code": "\t\t\t",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 170,
+      "code": "\t\t\t* keep only the fundholding that is most recent relative to the meetingdate",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "代码注释：keep only the fundholding that is most recent relative to the meetingdate"
+    },
+    {
+      "line": 171,
+      "code": "\t\t\tg diffDays=meetingdate-rdate",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 172,
+      "code": "\t\t\tdrop if diffDays<0",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 173,
+      "code": "\t\t\tdrop if diffDays>90",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 174,
+      "code": "\t\t\tbys companyid meetingdate fundno: egen min_diffDays=min(diffDays)",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 175,
+      "code": "\t\t\tkeep if min_diffDays==diffDays",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 176,
+      "code": "\t\t\tdrop ticker diffDays min_diffDays ",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 177,
+      "code": "\t\t\tduplicates drop",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 178,
+      "code": "\t\t\t",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 179,
+      "code": "\t\t\t* add up market valuations of shares owned from different share classes",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "代码注释：add up market valuations of shares owned from different share classes"
+    },
+    {
+      "line": 180,
+      "code": "\t\t\tg assets=prc*shares",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 181,
+      "code": "\t\t\tbys companyid meetingdate fundno: egen sum_assets=sum(assets)",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "在指定分组内计算均值或总量，用于年度聚合、持股比例或同行群体统计。"
+    },
+    {
+      "line": 182,
+      "code": "\t\t\tdrop prc shares assets",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 183,
+      "code": "\t\t\tduplicates drop",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 184,
+      "code": "\t\t\trename sum_assets assets",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 185,
+      "code": "\t\t\t",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 186,
+      "code": "\t\t\t* keep the cusip of the class with the most outstanding shares",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "代码注释：keep the cusip of the class with the most outstanding shares"
+    },
+    {
+      "line": 187,
+      "code": "\t\t\tbys companyid meetingdate fundno: egen max_shrout=max(shrout)",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 188,
+      "code": "\t\t\tkeep if max_shrout==shrout",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 189,
+      "code": "\t\t\tdrop max_shrout shrout",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 190,
+      "code": "\t\t\t",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 191,
+      "code": "\t\t\t* any more double reportings by funds? => no.",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "代码注释：any more double reportings by funds? => no."
+    },
+    {
+      "line": 192,
+      "code": "\t\t\tduplicates report companyid meetingdate cusip fundno ",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 193,
+      "code": "\t\t\t",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 194,
+      "code": "\t\tsave \"fundHoldingsAtMeeting_`y'\", replace",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 195,
+      "code": "\t}",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 196,
+      "code": "\t\t",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 197,
+      "code": "\tuse \"fundHoldingsAtMeeting_2007\", clear",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 198,
+      "code": "\trm \"fundHoldingsAtMeeting_2007.dta\"",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 199,
+      "code": "\tforvalues y=2008(1)2017 {",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 200,
+      "code": "\t\tappend using \"fundHoldingsAtMeeting_`y'\"",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 201,
+      "code": "\t\trm \"fundHoldingsAtMeeting_`y'.dta\"",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 202,
+      "code": "\t}",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 203,
+      "code": "\tcompress",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "压缩变量存储类型，在不改变数值的前提下降低大型数据集内存占用。"
+    },
+    {
+      "line": 204,
+      "code": "\tsave \"fundHoldingsAtMeeting\", replace",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 205,
+      "code": "",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 206,
+      "code": "",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 207,
+      "code": "**************************************************************************************",
+      "section": "Step 2. For each firm's annual meeting, get the last disclosed holdings",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 208,
+      "code": "* Step 3. Finally merge in investors' propensity to vote with ISS [created in ",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "代码注释：Step 3. Finally 合并 in investors' propensity to vote with ISS [created in"
+    },
+    {
+      "line": 209,
+      "code": "*      step 1] and weight it by the size of the holdings.",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "代码注释：step 1] and weight it by the size of the holdings."
+    },
+    {
+      "line": 210,
+      "code": "**************************************************************************************",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 211,
+      "code": "",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 212,
+      "code": "\tunzipfile \"wrds/msf_2007to2019.zip\", replace",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 213,
+      "code": "\tunzipfile \"wrds/iss_tr_linktable.zip\", replace",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 214,
+      "code": "\tunzipfile \"wrds/ccm_linktable.zip\", replace",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 215,
+      "code": "\t",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 216,
+      "code": "\t* MSF to get market valuations from CRSP",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "代码注释：MSF to get market valuations from CRSP"
+    },
+    {
+      "line": 217,
+      "code": "\tuse \"msf_2007to2019\", clear",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 218,
+      "code": "\t\tkeep permno permco ncusip cusip date shrout prc",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 219,
+      "code": "\t\tkeep if inrange(date, mdy(12,31,2007), mdy(12,31,2019))",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 220,
+      "code": "\t\tg mktval=prc*(shrout*1000)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 221,
+      "code": "\t\tdrop prc shrout",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 222,
+      "code": "\t\tg mofd=mofd(date)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 223,
+      "code": "\t\trename permco lpermco",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 224,
+      "code": "\t\tjoinby lpermco using \"ccm_linktable\", unmatched(master)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 225,
+      "code": "\t\t\ttab  _merge",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 226,
+      "code": "\t\t\tdrop _merge",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 227,
+      "code": "\t\t\trename lpermco permco",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 228,
+      "code": "\t\t\tkeep if inrange(date, linkdt, linkenddt)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 229,
+      "code": "\t\t\tkeep permno permco ncusip cusip date gvkey cik mofd mktval",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 230,
+      "code": "\t\t\tduplicates drop\t\t",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 231,
+      "code": "\tsave \"temp_mse\", replace",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 232,
+      "code": "",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 233,
+      "code": "\tuse \"iss_tr_linktable\", clear",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 234,
+      "code": "\t\tbys iss_fundno iss_fundno: egen min_spell_dist=min(spell_dist)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 235,
+      "code": "\t\tkeep if min_spell_dist==spell_dist",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 236,
+      "code": "\t\tkeep if score<=2",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 237,
+      "code": "\t\tkeep iss_fundno tr_fundno",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 238,
+      "code": "\t\tduplicates drop",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 239,
+      "code": "\tsave \"temp_linktable\", replace",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 240,
+      "code": "",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 241,
+      "code": "\tuse \"fundHoldingsAtMeeting\", clear",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 242,
+      "code": "\t\trename fundno tr_fundno",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 243,
+      "code": "\t\tjoinby tr_fundno using \"temp_linktable\", unmatched(master)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 244,
+      "code": "\t\t\ttab  _merge",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 245,
+      "code": "\t\t\tdrop _merge",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 246,
+      "code": "\t\tkeep if iss_fundno!=.",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 247,
+      "code": "\t\trename iss_fundno iss_fundid",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 248,
+      "code": "\t\tjoinby iss_fundid year using \"propVotingWithISS\", unmatched(master)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 249,
+      "code": "\t\t\ttab  _merge",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 250,
+      "code": "\t\t\tdrop _merge",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 251,
+      "code": "\t\t",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 252,
+      "code": "\t\t* each tr_fundno to one iss_fundid matched (<0.01% duplicates)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "代码注释：each tr_fundno to one iss_fundid matched (<0.01% duplicates)"
+    },
+    {
+      "line": 253,
+      "code": "\t\tduplicates report companyid meetingdate tr_fundno cusip iss_fundid",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 254,
+      "code": "\t\tduplicates drop companyid meetingdate tr_fundno cusip iss_fundid, force",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 255,
+      "code": "\t\t",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 256,
+      "code": "\t\t* merge in market valuation of cusips from CRSP",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "代码注释：合并 in market valuation of cusips from CRSP"
+    },
+    {
+      "line": 257,
+      "code": "\t\tcount",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 258,
+      "code": "\t\tg mofd=mofd(meetingdate)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 259,
+      "code": "\t\tjoinby mofd cusip using \"temp_mse\", unmatched(master)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 260,
+      "code": "\t\t\ttab  _merge",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 261,
+      "code": "\t\t\tdrop _merge mofd",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 262,
+      "code": "\t\t\tduplicates drop",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 263,
+      "code": "\t\t\tduplicates report companyid meetingdate tr_fundno cusip iss_fundid",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 264,
+      "code": "\t\t",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 265,
+      "code": "\t\t* in some rare cases, multiple class shares ",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "代码注释：in some rare cases, multiple class shares"
+    },
+    {
+      "line": 266,
+      "code": "\t\tduplicates drop companyid meetingdate tr_fundno iss_fundid, force",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 267,
+      "code": "\t\t",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 268,
+      "code": "\t\tg fyear=yofd(meetingdate)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 269,
+      "code": "\t\treplace fyear=fyear-1 if month(meetingdate)<=6",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 270,
+      "code": "",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 271,
+      "code": "\t\t* average across all funds",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "代码注释：average across all funds"
+    },
+    {
+      "line": 272,
+      "code": "\t\tbys companyid fyear: egen mn_fundWithISS_ver1=mean(frac_fundWithISS_ver1)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "在指定分组内计算均值或总量，用于年度聚合、持股比例或同行群体统计。"
+    },
+    {
+      "line": 273,
+      "code": "\t\tbys companyid fyear: egen mn_fundWithISS_ver2=mean(frac_fundWithISS_ver2)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "在指定分组内计算均值或总量，用于年度聚合、持股比例或同行群体统计。"
+    },
+    {
+      "line": 274,
+      "code": "\t\tg w_frac_fundWithISS_ver1=frac_fundWithISS_ver1*(assets/mktval)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 275,
+      "code": "\t\tg w_frac_fundWithISS_ver2=frac_fundWithISS_ver2*(assets/mktval)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 276,
+      "code": "\t\tbys companyid fyear: egen w_sum_fundWithISS_ver1=sum(w_frac_fundWithISS_ver1)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "在指定分组内计算均值或总量，用于年度聚合、持股比例或同行群体统计。"
+    },
+    {
+      "line": 277,
+      "code": "\t\tbys companyid fyear: egen w_sum_fundWithISS_ver2=sum(w_frac_fundWithISS_ver2)",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "在指定分组内计算均值或总量，用于年度聚合、持股比例或同行群体统计。"
+    },
+    {
+      "line": 278,
+      "code": "\t\t",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 279,
+      "code": "\t\tdestring gvkey cik, replace",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 280,
+      "code": "\t\tkeep cik gvkey fyear mn_* w_sum*",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 281,
+      "code": "\t\tduplicates drop",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 282,
+      "code": "\t\tcount",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 283,
+      "code": "",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 284,
+      "code": "\t\t* other variable names and labels",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "代码注释：other variable names and labels"
+    },
+    {
+      "line": 285,
+      "code": "\t\trename mn_fundWithISS_ver1    votingWithISS",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 286,
+      "code": "\t\trename mn_fundWithISS_ver2    votingWithISS_disagreement",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 287,
+      "code": "\t\trename w_sum_fundWithISS_ver1 votingWithISS_w",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 288,
+      "code": "\t\trename w_sum_fundWithISS_ver2 votingWithISS_disagreement_w",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 289,
+      "code": "",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 290,
+      "code": "\t\tlabel variable votingWithISS                \"Propensity to vote with ISS for funds\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 291,
+      "code": "\t\tlabel variable votingWithISS_disagreement   \"Propensity to vote with ISS for funds when mgmt and ISS disagree\"\t\t",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 292,
+      "code": "\t\tlabel variable votingWithISS_w              \"Propensity to vote with ISS for funds, asset-weighted\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 293,
+      "code": "\t\tlabel variable votingWithISS_disagreement_w \"Propensity to vote with ISS for funds when mgmt and ISS disagree, asset-weighted\"\t\t",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 294,
+      "code": "\t",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 295,
+      "code": "\tcompress",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "压缩变量存储类型，在不改变数值的前提下降低大型数据集内存占用。"
+    },
+    {
+      "line": 296,
+      "code": "\tsave \"issInfluence\", replace",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 297,
+      "code": "\t\trm \"temp1.dta\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 298,
+      "code": "\t\trm \"temp2.dta\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 299,
+      "code": "\t\trm \"temp_mse.dta\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 300,
+      "code": "\t\trm \"tempHoldings.dta\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 301,
+      "code": "\t\trm \"recs_2005_2023.dta\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 302,
+      "code": "\t\trm \"msf_2007to2019.dta\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 303,
+      "code": "\t\trm \"temp_linktable.dta\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 304,
+      "code": "\t\trm \"companyMeetings.dta\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 305,
+      "code": "\t\trm \"iss_tr_linktable.dta\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 306,
+      "code": "\t\trm \"propVotingWithISS.dta\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 307,
+      "code": "\t\trm \"fundHoldingsAtMeeting.dta\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 308,
+      "code": "\t\trm \"iss_votinganalytics_vote_results_2003to2017.dta\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 309,
+      "code": "\t\tforvalues y=2007(1)2017 {",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 310,
+      "code": "\t\t\trm \"voteanalysis_npx_`y'.dta\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 311,
+      "code": "\t\t\trm \"voteanalysis_npx_`y'.zip\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 312,
+      "code": "\t\t}",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 313,
+      "code": "\t\trm \"voteanalysis_npx_2018.zip\"",
+      "section": "Step 3. Finally merge in investors' propensity to vote with ISS [created in",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    }
+  ]
+}

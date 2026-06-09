@@ -1,0 +1,13 @@
+		(1)	(2)	(3)
+VARIABLES	LABELS	sd_mom_ceopay	sd_mom_abn_pay	sd_mom_ceopay_noopt
+				
+t	t	-0.002	0.001	-0.001
+		(-1.251)	(0.497)	(-0.509)
+Constant	Constant	2.705***	2.493***	1.704***
+		(97.077)	(97.520)	(71.391)
+				
+Observations		23,529	23,529	23,529
+R-squared		0.091	0.086	0.086
+Sample		1996-2023	1996-2023	1996-2023
+Firm FE		No	Yes	No
+Clustering		Firm	Firm	Firm

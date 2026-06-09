@@ -1,0 +1,23 @@
+		(1)	(2)	(3)	(4)	(5)	(6)	(7)	(8)
+VARIABLES	LABELS	frac_biLinks	frac_biLinks	reciprocity	reciprocity	transitivity	transitivity	clustering	clustering
+									
+t	t	-0.000	-0.000	0.000	-0.000	-0.000	-0.000	-0.000	-0.000
+		(-0.434)	(-0.659)	(0.131)	(-0.495)	(-0.448)	(-0.474)	(-0.438)	(-1.653)
+lag_log_at_real	lag_log_at_real		-0.000		0.001		0.001		-0.001
+			(-0.054)		(0.673)		(0.661)		(-0.672)
+lag_tobins_q	lag_tobins_q		0.000		0.001		0.001		0.000
+			(0.116)		(0.520)		(0.755)		(0.112)
+lag_sales_growth	lag_sales_growth		0.001		-0.005		0.002		0.006
+			(0.706)		(-1.177)		(2.064)		(1.038)
+lag_stock_ret_12m	lag_stock_ret_12m		0.001		0.007**		0.002		-0.006
+			(1.173)		(4.541)		(1.104)		(-1.585)
+lag_idio_ret_vol_12m	lag_idio_ret_vol_12m		-0.004		-0.009		-0.017		-0.014
+			(-1.598)		(-0.693)		(-1.450)		(-0.689)
+Constant	Constant	0.368***	0.369***	0.184***	0.175***	0.086***	0.082***	0.192***	0.207***
+		(531.915)	(166.199)	(7.361)	(11.529)	(6.045)	(8.951)	(8.248)	(17.033)
+									
+Observations		370,169	368,268	440	378	440	378	440	378
+R-squared		0.000	0.007	0.000	0.636	0.000	0.557	0.000	0.624
+Firm controls		No	Yes	No	Yes	No	Yes	No	Yes
+Industry X Size FE		Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes
+Firm FE		Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes

@@ -1,0 +1,1010 @@
+{
+  "file": "prepare-iss-peergroups.do",
+  "language": "Stata",
+  "purpose": "按照 ISS 公开方法构建合成薪酬同行群体",
+  "lineCount": 167,
+  "records": [
+    {
+      "line": 1,
+      "code": "**************************************************************************************************************",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 2,
+      "code": "* ISS's 2012 Peer selection methodology",
+      "section": "文件初始化",
+      "explanation": "代码注释：ISS's 2012 Peer selection methodology"
+    },
+    {
+      "line": 3,
+      "code": "*    Source: https://www.issgovernance.com/file/files/EvaluatingPayForPerformance_final_updated_02172012.pdf",
+      "section": "文件初始化",
+      "explanation": "代码注释：Source: https://www.issgovernance.com/file/files/EvaluatingPayForPerformance_final_updated_02172012.pdf"
+    },
+    {
+      "line": 4,
+      "code": "*            (last time accessed: April 14, 2025)",
+      "section": "文件初始化",
+      "explanation": "代码注释：(last time accessed: April 14, 2025)"
+    },
+    {
+      "line": 5,
+      "code": "***************************************************************************************************************",
+      "section": "文件初始化",
+      "explanation": "代码注释："
+    },
+    {
+      "line": 6,
+      "code": "",
+      "section": "文件初始化",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 7,
+      "code": "\t*** Step 1: prepare data with all firms that we have data on",
+      "section": "Step 1: prepare data with all firms that we have data on",
+      "explanation": "代码注释：Step 1: prepare data with all firms that we have data on"
+    },
+    {
+      "line": 8,
+      "code": "\tuse \"compustat\", clear",
+      "section": "Step 1: prepare data with all firms that we have data on",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 9,
+      "code": "\t\tkeep if inrange(fyear, 2007, 2023)",
+      "section": "Step 1: prepare data with all firms that we have data on",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 10,
+      "code": "\t\trename mktval mktcap",
+      "section": "Step 1: prepare data with all firms that we have data on",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 11,
+      "code": "\t\tkeep fyear gvkey cik mktcap sale at gics6",
+      "section": "Step 1: prepare data with all firms that we have data on",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 12,
+      "code": "\t\t\t\t\t",
+      "section": "Step 1: prepare data with all firms that we have data on",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 13,
+      "code": "\t\t* has to have these data points ...",
+      "section": "Step 1: prepare data with all firms that we have data on",
+      "explanation": "代码注释：has to have these data points ..."
+    },
+    {
+      "line": 14,
+      "code": "\t\tdrop if missing(mktcap,sale,at,gics6)",
+      "section": "Step 1: prepare data with all firms that we have data on",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 15,
+      "code": "",
+      "section": "Step 1: prepare data with all firms that we have data on",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 16,
+      "code": "\t\tsort gvkey fyear",
+      "section": "Step 1: prepare data with all firms that we have data on",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 17,
+      "code": "\t\torder gvkey fyear",
+      "section": "Step 1: prepare data with all firms that we have data on",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 18,
+      "code": "\t\t* => 15,353 distinct firms",
+      "section": "Step 1: prepare data with all firms that we have data on",
+      "explanation": "代码注释：=> 15,353 distinct firms"
+    },
+    {
+      "line": 19,
+      "code": "\t\tdistinct gvkey",
+      "section": "Step 1: prepare data with all firms that we have data on",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 20,
+      "code": "\tsave \"all_companies\", replace",
+      "section": "Step 1: prepare data with all firms that we have data on",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 21,
+      "code": "",
+      "section": "Step 1: prepare data with all firms that we have data on",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 22,
+      "code": "\t*** Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "代码注释：Step 2: 合并 with itself to create for each firm, the universe of potential peers"
+    },
+    {
+      "line": 23,
+      "code": "\tforvalues y=2007(1)2023 { ",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 24,
+      "code": "\t\tdi \"'=== Running year `y' ===\"",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 25,
+      "code": "\t\tuse \"all_companies\", clear",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 26,
+      "code": "\t\tkeep if fyear==`y'",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 27,
+      "code": "\t\t",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 28,
+      "code": "\t\tforeach v of varlist * {",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 29,
+      "code": "\t\t\trename `v' `v'_1",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 30,
+      "code": "\t\t}",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 31,
+      "code": "\t\t",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 32,
+      "code": "\t\trename fyear_1 fyear",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 33,
+      "code": "\t\tjoinby fyear using \"all_companies\", unmatched(master)",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 34,
+      "code": "\t\t\ttab  _merge",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 35,
+      "code": "\t\t\tdrop _merge",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 36,
+      "code": "\t\t\t",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 37,
+      "code": "\t\tforeach v1 of varlist * {",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 38,
+      "code": "\t\t\tforeach v2 of varlist `v1'* {",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 39,
+      "code": "\t\t\t\tif ustrcompare(\"`v1'\", \"`v2'\")!=0 {",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "执行 Stata 数据管理、变量构造或结果输出语句；其具体作用由当前模块与变量名称共同确定。"
+    },
+    {
+      "line": 40,
+      "code": "\t\t\t\t\trename `v1' `v1'_2",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "统一变量名称、标签或显示格式，使变量语义和输出表头可读。"
+    },
+    {
+      "line": 41,
+      "code": "\t\t\t\t}",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 42,
+      "code": "\t\t\t}",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 43,
+      "code": "\t\t}",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 44,
+      "code": "\t\tdrop if gvkey_1==gvkey_2 ",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 45,
+      "code": "",
+      "section": "Step 2: merge with itself to create for each firm, the universe of potential peers",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 46,
+      "code": "\t\t*** Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：Step (3) now narrow down the field of potential peers by ISS's methodology"
+    },
+    {
+      "line": 47,
+      "code": "\t\t***   3.A) Creating the Peer Universe: ISS chooses companies ... ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：3.A) Creating the Peer Universe: ISS chooses companies ..."
+    },
+    {
+      "line": 48,
+      "code": "\t\t***   i)   in the same 2-digit GICS universe as the subject, ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：i)   in the same 2-digit GICS universe as the subject,"
+    },
+    {
+      "line": 49,
+      "code": "\t\t***   ii)  between 0.45 times and 2.1 times the subject company's annual revenues (assets for financial companies), and",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：ii)  between 0.45 times and 2.1 times the subject company's annual revenues (assets for financial companies), and"
+    },
+    {
+      "line": 50,
+      "code": "\t\t***   iii) with market capitalizations of between 0.2 times and 5 times the subject company. ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：iii) with market capitalizations of between 0.2 times and 5 times the subject company."
+    },
+    {
+      "line": 51,
+      "code": "\t\t",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 52,
+      "code": "\t\t* i) same 2-digit GICS",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：i) same 2-digit GICS"
+    },
+    {
+      "line": 53,
+      "code": "\t\tkeep if int(gics6_1/10000)==int(gics6_2/10000)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 54,
+      "code": "",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 55,
+      "code": "\t\t* ii) between 0.45 and 2.1 times the subject company's annual revenues (assets for financial companies)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：ii) between 0.45 and 2.1 times the subject company's annual revenues (assets for financial companies)"
+    },
+    {
+      "line": 56,
+      "code": "\t\tg size_1=.",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 57,
+      "code": "\t\t\treplace size_1=sale_1",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 58,
+      "code": "\t\t\treplace size_1=at_1 if inlist(gics6_1, 401010, 401020, 402010, 402020)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 59,
+      "code": "\t\tg size_2=.",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 60,
+      "code": "\t\t\treplace size_2=sale_2",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 61,
+      "code": "\t\t\treplace size_2=at_2 if inlist(gics6_2, 401010, 401020, 402010, 402020)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 62,
+      "code": "\t\tkeep if inrange(size_2, 0.45*size_1, 2.1*size_1)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 63,
+      "code": "\t\t",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 64,
+      "code": "\t\t* iii) with market cap of between 0.2 and 5 times the subject company. ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：iii) with market cap of between 0.2 and 5 times the subject company."
+    },
+    {
+      "line": 65,
+      "code": "\t\tkeep if inrange(mktcap_2, 0.2*mktcap_1, 5*mktcap_1)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 66,
+      "code": "\t\t\t",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 67,
+      "code": "\t\t\t",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 68,
+      "code": "\t\t* 3.B) ISS selects companies from the comparison universe that are ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：3.B) ISS selects companies from the comparison universe that are"
+    },
+    {
+      "line": 69,
+      "code": "\t\t*   - in the subject company's 6-digit GICS category, ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：- in the subject company's 6-digit GICS category,"
+    },
+    {
+      "line": 70,
+      "code": "\t\t*   - first selecting the companies closest in size, while where possible alternating between companies larger and ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：- first selecting the companies closest in size, while where possible alternating between companies larger and"
+    },
+    {
+      "line": 71,
+      "code": "\t\t*     smaller than the subject company so as to maintain the subject at or near the median of the chosen comparison group. ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：smaller than the subject company so as to maintain the subject at or near the median of the chosen comparison group."
+    },
+    {
+      "line": 72,
+      "code": "\t\t*   - If the comparison group reaches the minimum 14 members, it is considered complete; ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：- If the comparison group reaches the minimum 14 members, it is considered complete;"
+    },
+    {
+      "line": 73,
+      "code": "\t\t*     up to 24 comparison companies can be selected from the 6-digit GICS category.",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：up to 24 comparison companies can be selected from the 6-digit GICS category."
+    },
+    {
+      "line": 74,
+      "code": "\t\t*  => if not 24 companies yet, then repeat with GICS4, then GICS2, until at least 14 companies found. ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：=> if not 24 companies yet, then repeat with GICS4, then GICS2, until at least 14 companies found."
+    },
+    {
+      "line": 75,
+      "code": "\t\tg abs_size_diff=abs(size_2-size_1)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 76,
+      "code": "\t\tdrop if abs_size_diff==.",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 77,
+      "code": "\t\tduplicates drop",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "检查或处理键的唯一性，防止错误的多对多合并和重复计数。"
+    },
+    {
+      "line": 78,
+      "code": "\t\tcount",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 79,
+      "code": "\t\tsave \"temp\", replace",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 80,
+      "code": "",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 81,
+      "code": "\t\t* Round 1: get best matches for GICS6 ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：Round 1: get best matches for GICS6"
+    },
+    {
+      "line": 82,
+      "code": "\t\t\tuse \"temp\", clear",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 83,
+      "code": "\t\t\tkeep if gics6_1==gics6_2",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 84,
+      "code": "\t\t\tsort gvkey_1 fyear abs_size_diff",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 85,
+      "code": "\t\t\tbys gvkey_1 fyear: g n1=_n",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 86,
+      "code": "\t\t\tg same_gics=6",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 87,
+      "code": "\t\t\tsave \"temp_round1\", replace",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 88,
+      "code": "\t\t\t",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 89,
+      "code": "\t\t* Round 2: get best matches for GICS4 ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：Round 2: get best matches for GICS4"
+    },
+    {
+      "line": 90,
+      "code": "\t\t\tuse \"temp\", clear",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 91,
+      "code": "\t\t\tkeep if int(gics6_1/100)==int(gics6_2/100)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 92,
+      "code": "\t\t\t* remove the matches we already got from Round 1",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：remove the matches we already got from Round 1"
+    },
+    {
+      "line": 93,
+      "code": "\t\t\tcount",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 94,
+      "code": "\t\t\tjoinby gvkey_1  fyear gvkey_2 using \"temp_round1\", unmatched(master)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 95,
+      "code": "\t\t\t\ttab _merge",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 96,
+      "code": "\t\t\t\tbys gvkey_1 fyear: egen max_n1=max(n1)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 97,
+      "code": "\t\t\t\treplace max_n1=0 if max_n1==.",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 98,
+      "code": "\t\t\t\tdrop if n1!=.",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 99,
+      "code": "\t\t\t\tdrop _merge n1 same_gics",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 100,
+      "code": "\t\t\tsort gvkey_1 fyear abs_size_diff",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 101,
+      "code": "\t\t\tbys gvkey_1 fyear: g n2=_n+max_n1",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 102,
+      "code": "\t\t\tg same_gics=4",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 103,
+      "code": "\t\t\tsave \"temp_round2\", replace",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 104,
+      "code": "\t\t",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 105,
+      "code": "\t\t* Round 3: get best matches for GICS2",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：Round 3: get best matches for GICS2"
+    },
+    {
+      "line": 106,
+      "code": "\t\t\tuse \"temp\", clear",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 107,
+      "code": "\t\t\tkeep if int(gics6_1/10000)==int(gics6_2/10000)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 108,
+      "code": "\t\t\t* remove the matches we already got from Rounds 1 and 2",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：remove the matches we already got from Rounds 1 and 2"
+    },
+    {
+      "line": 109,
+      "code": "\t\t\tcount",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 110,
+      "code": "\t\t\tjoinby gvkey_1 fyear gvkey_2 using \"temp_round1\", unmatched(master)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 111,
+      "code": "\t\t\t\ttab  _merge",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 112,
+      "code": "\t\t\t\tbys  gvkey_1 fyear: egen max_n1=max(n1)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 113,
+      "code": "\t\t\t\tdrop if n1!=.",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 114,
+      "code": "\t\t\t\tdrop _merge n1 same_gics",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 115,
+      "code": "\t\t\tcount",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 116,
+      "code": "\t\t\tjoinby gvkey_1 fyear gvkey_2 using \"temp_round2\", unmatched(master)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "按共同键执行多对多连接，常用于构造公司与潜在同行公司的配对集合。"
+    },
+    {
+      "line": 117,
+      "code": "\t\t\t\ttab  _merge",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 118,
+      "code": "\t\t\t\tbys gvkey_1 fyear: egen max_n2=max(n2)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 119,
+      "code": "\t\t\t\treplace max_n2=0 if max_n2==. & max_n1==.",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 120,
+      "code": "\t\t\t\treplace max_n2=max_n1 if max_n2==. & max_n1!=.",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 121,
+      "code": "\t\t\t\tdrop if n2!=.",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 122,
+      "code": "\t\t\t\tdrop _merge n2 same_gics",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 123,
+      "code": "\t\t\tsort gvkey_1 fyear abs_size_diff",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 124,
+      "code": "\t\t\tbys gvkey_1 fyear: g n3=_n+max_n2",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 125,
+      "code": "\t\t\tg same_gics=2",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 126,
+      "code": "\t\t\tsave \"temp_round3\", replace",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 127,
+      "code": "\t\t\t\t",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 128,
+      "code": "\t\t* merge the matches",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：合并 the matches"
+    },
+    {
+      "line": 129,
+      "code": "\t\tuse \"temp_round1\", clear",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 130,
+      "code": "\t\t\tappend using \"temp_round2\"",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 131,
+      "code": "\t\t\tappend using \"temp_round3\"",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 132,
+      "code": "\t\tegen n=rowmax(n1 n2 n3)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "按公司、年份、行业或同行群体分组计算变量，保持统计量与论文分析层级一致。"
+    },
+    {
+      "line": 133,
+      "code": "\t\tdrop n1 n2 n3 max_n*",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 134,
+      "code": "\t\tgsort gvkey_1 fyear n",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "调整观测或变量顺序，为滞后、去重、连接或展示提供确定性排序。"
+    },
+    {
+      "line": 135,
+      "code": "",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 136,
+      "code": "\t\tg rank=n",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 137,
+      "code": "\t\tkeep gvkey_1 gvkey_2 cik_1 cik_2 fyear rank same_gics",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 138,
+      "code": "\t\t",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 139,
+      "code": "\t\t* ISS designates peer groups of at least 14 to 24 cases ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：ISS designates peer groups of at least 14 to 24 cases"
+    },
+    {
+      "line": 140,
+      "code": "\t\tg isspeer=0",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "生成新变量；右侧表达式定义其经济含义、变换方式或处理组状态。"
+    },
+    {
+      "line": 141,
+      "code": "\t\t\t* from the same GICS6 up to 24",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：from the same GICS6 up to 24"
+    },
+    {
+      "line": 142,
+      "code": "\t\t\treplace isspeer=1 if same_gics==6 & inrange(rank, 1, 24)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 143,
+      "code": "\t\t\t* if not yet 14 found, then go up to 14th-ranked peers (which will add first GICS4, then - in a few cases - GICS2)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：if not yet 14 found, then go up to 14th-ranked peers (which will add first GICS4, then - in a few cases - GICS2)"
+    },
+    {
+      "line": 144,
+      "code": "\t\t\tbys fyear gvkey_1: egen count=sum(isspeer) ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "在指定分组内计算均值或总量，用于年度聚合、持股比例或同行群体统计。"
+    },
+    {
+      "line": 145,
+      "code": "\t\t\treplace isspeer=1 if count<14 & inrange(rank, 1, 14) ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "在满足条件时重写已有变量，用于补值、修正规则或构造事件状态。"
+    },
+    {
+      "line": 146,
+      "code": "\t\t\tdrop count",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 147,
+      "code": "\t\t\tbys fyear gvkey_1: egen count=sum(isspeer)",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "在指定分组内计算均值或总量，用于年度聚合、持股比例或同行群体统计。"
+    },
+    {
+      "line": 148,
+      "code": "\t\t\t* only 0.6 percent of data with less than 14 peers",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：only 0.6 percent of data with less than 14 peers"
+    },
+    {
+      "line": 149,
+      "code": "\t\t\ttab count",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "执行描述性检查或样本审计，不改变数据；用于核对分布、样本量和匹配质量。"
+    },
+    {
+      "line": 150,
+      "code": "\t\t\tdrop count",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保留或删除指定观测/变量，落实样本筛选并控制数据规模。"
+    },
+    {
+      "line": 151,
+      "code": "\t\tsave \"ISSpeergroups_`y'\", replace",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 152,
+      "code": "\t}",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 153,
+      "code": "\t",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "空行，用于分隔代码模块并提高可读性。"
+    },
+    {
+      "line": 154,
+      "code": "\t* merge together",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：合并 together"
+    },
+    {
+      "line": 155,
+      "code": "\tuse \"ISSpeergroups_2007\", clear",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "载入 Stata 数据集；`clear` 表示允许覆盖当前内存数据。"
+    },
+    {
+      "line": 156,
+      "code": "\trm \"ISSpeergroups_2007.dta\"",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 157,
+      "code": "\tforvalues y=2008(1)2023 { ",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "启动循环，对年份、变量、分位点、行业层级或模型设定进行批量处理。"
+    },
+    {
+      "line": 158,
+      "code": "\t\tappend using \"ISSpeergroups_`y'\"",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "纵向追加数据，将多个年份、地区或来源的数据堆叠为统一样本。"
+    },
+    {
+      "line": 159,
+      "code": "\t\trm \"ISSpeergroups_`y'.dta\"",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 160,
+      "code": "\t}",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "结束当前循环、条件或局部作用域代码块。"
+    },
+    {
+      "line": 161,
+      "code": "\tsave \"ISSpeergroups\", replace",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "保存当前内存数据，形成中间数据集或最终分析输入。"
+    },
+    {
+      "line": 162,
+      "code": "\t\t* clean up",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "代码注释：clean up"
+    },
+    {
+      "line": 163,
+      "code": "\t\trm \"temp.dta\"",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 164,
+      "code": "\t\trm \"temp_round1.dta\"",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 165,
+      "code": "\t\trm \"temp_round2.dta\"",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 166,
+      "code": "\t\trm \"temp_round3.dta\"",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    },
+    {
+      "line": 167,
+      "code": "\t\trm \"all_companies.dta\"",
+      "section": "Step (3) now narrow down the field of potential peers by ISS's methodology",
+      "explanation": "删除旧输出，确保本次运行生成的文件不会与历史结果混淆。"
+    }
+  ]
+}

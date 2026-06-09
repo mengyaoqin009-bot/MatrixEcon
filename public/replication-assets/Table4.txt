@@ -1,0 +1,31 @@
+		(1)	(2)	(3)	(4)	(5)
+VARIABLES	LABELS	sd_mom_ceopay_econ	sd_mom_ceopay_econ	sd_mom_ceopay_econ	sd_mom_ceopay_econ	sd_mom_ceopay_econ
+						
+sd_rel_at	SD of relative size	2.020**				
+		(2.318)				
+lag_log_at_real	lag_log_at_real	-0.186	-0.192	-0.186	-0.197	-0.188
+		(-0.397)	(-0.409)	(-0.398)	(-0.421)	(-0.400)
+lag_tobins_q	lag_tobins_q	1.032*	1.028*	1.031*	1.026*	1.032*
+		(1.904)	(1.896)	(1.902)	(1.894)	(1.904)
+lag_sales_growth	lag_sales_growth	-2.869	-2.886	-2.839	-2.797	-2.833
+		(-1.024)	(-1.028)	(-1.012)	(-0.997)	(-1.010)
+lag_stock_ret_12m	lag_stock_ret_12m	-0.579	-0.606	-0.605	-0.575	-0.610
+		(-0.319)	(-0.334)	(-0.333)	(-0.317)	(-0.336)
+lag_idio_ret_vol_12m	lag_idio_ret_vol_12m	-1.974	-1.963	-1.975	-1.865	-1.948
+		(-0.361)	(-0.359)	(-0.362)	(-0.342)	(-0.357)
+sd_rel_mktval	SD of relative market cap		1.202			
+			(1.367)			
+frac_atypicalPeers	Deviation from industry-size benchmarking			-2.871		
+				(-0.889)		
+frac_issPeers	Fraction of ISS peers				-7.349*	
+					(-1.682)	
+frac_biLinks	frac_biLinks					-1.918
+						(-0.542)
+Constant	Constant	257.560***	258.488***	261.179***	262.069***	260.621***
+		(56.107)	(56.368)	(55.712)	(55.911)	(55.655)
+						
+Observations		35,273	35,273	35,273	35,273	35,273
+R-squared		0.097	0.097	0.097	0.097	0.097
+Firm controls		Yes	Yes	Yes	Yes	Yes
+Industry X Year FE		Yes	Yes	Yes	Yes	Yes
+Firm FE		Yes	Yes	Yes	Yes	Yes

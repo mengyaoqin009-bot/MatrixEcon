@@ -1,0 +1,25 @@
+		(1)	(2)	(3)	(4)	(5)	(6)	(7)	(8)	(9)
+VARIABLES	LABELS	sd_mom_ceopay_econ	sd_mom_ceopay_econ	sd_mom_ceopay_econ	sd_mom_abn_ceopay_econ	sd_mom_abn_ceopay_econ	sd_mom_abn_ceopay_econ	sd_mom_ceopay_noopt_econ	sd_mom_ceopay_noopt_econ	sd_mom_ceopay_noopt_econ
+										
+t	Annual trend variable	0.001*	0.001*	0.001*	0.001**	0.001**	0.001**	0.000	0.000	0.000
+		(1.907)	(1.809)	(1.768)	(2.347)	(2.315)	(2.329)	(0.826)	(0.704)	(0.738)
+lag_log_at_real	lag_log_at_real		-0.002*	-0.002*		-0.002**	-0.002**		-0.000	-0.000
+			(-1.677)	(-1.660)		(-2.195)	(-2.022)		(-0.208)	(-0.260)
+lag_tobins_q	lag_tobins_q		0.002	0.002		0.001	0.001		0.000	0.000
+			(1.277)	(1.217)		(0.617)	(0.643)		(0.313)	(0.303)
+lag_sales_growth	lag_sales_growth		-0.015*	-0.016*		0.003	0.003		0.001	0.000
+			(-1.868)	(-1.948)		(0.435)	(0.422)		(0.111)	(0.021)
+lag_stock_ret_12m	lag_stock_ret_12m		0.007	0.007		0.004	0.004		0.003	0.003
+			(1.241)	(1.220)		(0.934)	(0.864)		(1.099)	(1.045)
+lag_idio_ret_vol_12m	lag_idio_ret_vol_12m		0.002	0.003		0.006	0.005		0.011	0.012
+			(0.128)	(0.170)		(0.482)	(0.400)		(1.196)	(1.340)
+cumGrowth_md_ceopay	cumGrowth_md_ceopay	-0.005	-0.004	-0.005	0.004	0.004	0.004	0.000	0.000	-0.000
+		(-1.163)	(-1.122)	(-1.172)	(1.149)	(1.279)	(1.217)	(0.008)	(0.001)	(-0.055)
+Constant	Constant	2.604***	2.620***	2.620***	2.120***	2.137***	2.135***	1.168***	1.166***	1.166***
+		(320.781)	(162.237)	(163.196)	(322.326)	(164.833)	(165.724)	(262.596)	(137.569)	(139.445)
+										
+Observations		370,169	368,268	368,268	370,169	368,268	368,268	370,169	368,268	368,268
+R-squared		0.000	0.001	0.007	0.000	0.001	0.006	0.000	0.001	0.007
+Firm controls		No	Yes	Yes	No	Yes	Yes	No	Yes	Yes
+Industry X Size FE		No	Yes	Yes	No	Yes	Yes	No	Yes	Yes
+Firm FE		No	No	Yes	No	No	Yes	No	No	Yes

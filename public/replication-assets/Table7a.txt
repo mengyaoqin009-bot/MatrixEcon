@@ -1,0 +1,37 @@
+		(1)	(2)	(3)	(4)
+VARIABLES	LABELS	dropped_peer	dropped_peer	dropped_peer	dropped_peer
+					
+dropped_by_ISS	Dropped by ISS	-0.003	-0.002	0.001	
+		(-0.500)	(-0.392)	(0.117)	
+in_ISS_peergroup_prior_year	in_ISS_peergroup_prior_year	0.001	0.001	0.001	-0.000
+		(0.655)	(0.633)	(0.568)	(-0.043)
+peer_delisted	peer_delisted	-0.001	-0.001	-0.002	-0.013
+		(-0.408)	(-0.264)	(-0.724)	(-1.573)
+chg_rel_mktval	Change in relative market value		-0.000	-0.000	-0.000
+			(-0.190)	(-1.422)	(-1.068)
+chg_rel_sale	Change in relative sales		-0.000	-0.000	0.000*
+			(-0.582)	(-0.142)	(1.700)
+main_log_at	main_log_at		0.001*	0.001	-0.000
+			(1.960)	(1.514)	(-0.017)
+main_tobins_q	main_tobins_q		-0.000	-0.000	-0.003*
+			(-0.440)	(-0.208)	(-1.742)
+main_sales_growth	main_sales_growth		0.005	0.005	-0.005
+			(1.639)	(1.533)	(-0.614)
+main_stock_ret_12m	main_stock_ret_12m		0.002	0.003	0.004
+			(0.834)	(1.442)	(0.683)
+main_idio_ret_vol_12m	main_idio_ret_vol_12m		-0.001	-0.003	0.022
+			(-0.119)	(-0.442)	(1.327)
+just_fell_below	just_fell_below				-0.014
+					(-1.010)
+Constant	Constant	0.206***	0.198***	0.199***	0.210***
+		(205.326)	(40.862)	(36.335)	(15.549)
+					
+Observations		245,240	244,816	236,590	55,937
+R-squared		0.000	0.024	0.194	0.469
+Firm controls		No	Yes	Yes	Yes
+Year FE		No	Yes	n/a	n/a
+Firm FE		No	Yes	n/a	n/a
+Peer FE		No	Yes	n/a	n/a
+Firm x Year		No	No	Yes	Yes
+Peer x Year		No	No	Yes	Yes
+)					
