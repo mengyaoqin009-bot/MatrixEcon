@@ -1156,10 +1156,105 @@ const mainFigureBodyAnchors = [
   { file: 'figure-7.pdf', pattern: /如 (?:Figure|图) 7 所示/ },
 ]
 
+function reflowTranslationFootnotes(markdown: string) {
+  const paragraphs = markdown.replace(/\r\n/g, '\n').split(/\n{2,}/)
+  const referencesIndex = paragraphs.findIndex((paragraph) => paragraph.trim() === '参考文献')
+  const contentEnd = referencesIndex >= 0 ? referencesIndex : paragraphs.length
+  const footnotes = new Map<number, string>()
+  const footnoteIndexes = new Set<number>()
+
+  for (let index = 0; index < contentEnd; index += 1) {
+    const paragraph = paragraphs[index].trim()
+    const match = paragraph.match(/^(\d{1,2})\s*(?=[\u3400-\u9fffA-Za-z])/)
+    if (!match) continue
+
+    const number = Number(match[1])
+    if (number < 1 || number > 99 || footnotes.has(number)) continue
+    footnotes.set(number, paragraph.replace(/^\d{1,2}\s*/, '').trim())
+    footnoteIndexes.add(index)
+  }
+
+  if (footnotes.size === 0) return markdown
+
+  const bodyParagraphs: string[] = []
+  let removedFootnoteSinceLastBody = false
+  const endsCompleteSentence = /(?:[。！？.!?；;：:”’"'）)\]〕]|[。！？；：）]\d{1,2}(?:[,，]\d{1,2})?)$/
+
+  paragraphs.forEach((paragraph, index) => {
+    if (footnoteIndexes.has(index)) {
+      removedFootnoteSinceLastBody = true
+      return
+    }
+
+    const trimmed = paragraph.trim()
+    const previous = bodyParagraphs.at(-1)
+    const canJoinPrevious = removedFootnoteSinceLastBody
+      && previous
+      && !endsCompleteSentence.test(previous)
+      && !trimmed.startsWith('#')
+      && !trimmed.startsWith('|')
+
+    if (canJoinPrevious) {
+      const continuation = previous.endsWith('如前所述，') && trimmed.startsWith('如前所述，')
+        ? trimmed.slice('如前所述，'.length)
+        : trimmed
+      bodyParagraphs[bodyParagraphs.length - 1] = `${previous}${continuation}`
+    } else {
+      bodyParagraphs.push(paragraph)
+    }
+    removedFootnoteSinceLastBody = false
+  })
+
+  const footnotesAfterParagraph = new Map<number, number[]>()
+  const assignedFootnotes = new Set<number>()
+  const pairedMarkerPattern = /([。；）])\s*(\d{1,2})\s*[,，]\s*(\d{1,2})(?=\s|$)/
+
+  bodyParagraphs.forEach((paragraph, index) => {
+    const match = paragraph.match(pairedMarkerPattern)
+    if (!match) return
+
+    const firstNumber = Number(match[2])
+    const secondNumber = Number(match[3])
+    if (!footnotes.has(firstNumber) || !footnotes.has(secondNumber)) return
+
+    bodyParagraphs[index] = paragraph.replace(
+      pairedMarkerPattern,
+      `$1〔脚注 ${firstNumber}、${secondNumber}〕`,
+    )
+    footnotesAfterParagraph.set(index, [firstNumber, secondNumber])
+    assignedFootnotes.add(firstNumber)
+    assignedFootnotes.add(secondNumber)
+  })
+
+  for (const number of [...footnotes.keys()].sort((left, right) => left - right)) {
+    if (assignedFootnotes.has(number)) continue
+    const markerPattern = new RegExp(`([。；）])\\s*${number}(?=\\s|$)`)
+    const paragraphIndex = bodyParagraphs.findIndex((paragraph) => markerPattern.test(paragraph))
+    if (paragraphIndex < 0) continue
+
+    bodyParagraphs[paragraphIndex] = bodyParagraphs[paragraphIndex].replace(
+      markerPattern,
+      `$1〔脚注 ${number}〕`,
+    )
+    const existing = footnotesAfterParagraph.get(paragraphIndex) ?? []
+    footnotesAfterParagraph.set(paragraphIndex, [...existing, number])
+  }
+
+  return bodyParagraphs.flatMap((paragraph, index) => {
+    const noteNumbers = footnotesAfterParagraph.get(index)
+    if (!noteNumbers) return [paragraph]
+
+    return [
+      paragraph,
+      ...noteNumbers.map((number) => `> **脚注 ${number}：** ${footnotes.get(number)}`),
+    ]
+  }).join('\n\n')
+}
+
 function prepareTranslationMarkdown(markdown: string) {
   const insertedAssets = new Set<string>()
 
-  return markdown
+  return reflowTranslationFootnotes(markdown)
     .split(/\r?\n/)
     .flatMap((line) => {
       const trimmed = line.trim()
