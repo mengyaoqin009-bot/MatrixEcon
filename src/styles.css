@@ -345,6 +345,35 @@ pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; background: #f3
 .interpretation-grid article > span { color: #c5ccd5; font: 600 32px "Source Serif 4", serif; }
 .interpretation-grid h3 { margin: -7px 0 9px; color: var(--navy); font: 600 15px "Noto Serif SC", serif; }
 .interpretation-grid p { margin: 0; font-size: 12px; }
+.personal-thought-card, .thought-composer { min-height: 190px; }
+.thought-card-actions { position: absolute; top: 14px; right: 14px; display: flex; gap: 6px; }
+.thought-card-actions button {
+  display: grid; place-items: center; width: 28px; height: 28px; padding: 0;
+  border: 1px solid #d3dae3; border-radius: 50%; color: var(--muted); background: #fff; cursor: pointer;
+}
+.thought-card-actions button:hover { color: var(--navy); border-color: var(--navy); }
+.thought-card-actions button:last-child:hover { color: var(--red); border-color: var(--red); }
+.thought-composer { display: flex; flex-direction: column; align-items: flex-start; }
+.thought-composer input, .thought-composer textarea, .thought-edit-form input, .thought-edit-form textarea {
+  width: 100%; border: 1px solid #ccd5df; background: #fafbfd; color: var(--text);
+  font: 11px/1.65 "Noto Sans SC", sans-serif;
+}
+.thought-composer input, .thought-edit-form input { min-height: 36px; padding: 7px 9px; }
+.thought-composer textarea, .thought-edit-form textarea { min-height: 78px; padding: 8px 9px; resize: vertical; }
+.thought-composer input:focus, .thought-composer textarea:focus, .thought-edit-form input:focus, .thought-edit-form textarea:focus {
+  outline: 2px solid #9aacbf; outline-offset: 1px; border-color: var(--navy);
+}
+.thought-composer button, .thought-edit-form button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 33px; margin-top: 9px; padding: 6px 11px; border: 1px solid var(--navy);
+  color: #fff; background: var(--navy); cursor: pointer; font-size: 10px;
+}
+.thought-composer button:disabled, .thought-edit-form button:disabled { cursor: not-allowed; opacity: .4; }
+.thought-composer small { margin-top: 8px; color: var(--muted); font-size: 9px; }
+.thought-edit-form { display: flex; flex-direction: column; gap: 7px; margin-top: -4px; }
+.thought-edit-form > div { display: flex; gap: 8px; }
+.thought-edit-form button { margin-top: 0; }
+.thought-edit-form button.secondary { color: var(--navy); background: #fff; }
 .replication-confidence { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 18px 0; }
 .replication-confidence article { display: flex; gap: 12px; padding: 14px; border: 1px solid var(--line); }
 .replication-confidence article > span {

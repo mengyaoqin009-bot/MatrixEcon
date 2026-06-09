@@ -14,7 +14,10 @@ import {
   Github,
   Mail,
   Menu,
+  Pencil,
+  Plus,
   Search,
+  Trash2,
   X,
 } from 'lucide-react'
 import { methods, papers, type Method, type Paper } from './data'
@@ -728,8 +731,171 @@ function LimitationsSection() {
   return <div className="argument-grid">{limitationCards.map(([title, body]) => <article key={title}><strong>{title}</strong><p>{body}</p></article>)}</div>
 }
 
-function InterpretationSection() {
-  return <div className="interpretation-grid">{interpretationCards.map(([title, body], index) => <article key={title}><span>{String(index + 1).padStart(2, '0')}</span><h3>{title}</h3><p>{body}</p></article>)}</div>
+type PersonalThought = {
+  id: string
+  number: number
+  title: string
+  body: string
+}
+
+function InterpretationSection({ paperId }: { paperId: string }) {
+  const storageKey = `matrixecon:paper-thoughts:${paperId}`
+  const nextNumberStorageKey = `${storageKey}:next-number`
+  const [thoughts, setThoughts] = useState<PersonalThought[]>([])
+  const [loaded, setLoaded] = useState(false)
+  const [nextNumber, setNextNumber] = useState(interpretationCards.length + 1)
+  const [title, setTitle] = useState('')
+  const [body, setBody] = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingTitle, setEditingTitle] = useState('')
+  const [editingBody, setEditingBody] = useState('')
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(storageKey)
+      const parsedValue = stored ? JSON.parse(stored) : []
+      const parsed = Array.isArray(parsedValue) ? parsedValue as Array<Partial<PersonalThought>> : []
+      const normalized = parsed
+        .filter((thought) => typeof thought.title === 'string' && typeof thought.body === 'string')
+        .map((thought, index) => ({
+          id: thought.id || `legacy-${index}`,
+          number: typeof thought.number === 'number' ? thought.number : interpretationCards.length + index + 1,
+          title: thought.title || '我的思考',
+          body: thought.body || '',
+        }))
+      setThoughts(normalized)
+      const maxSavedNumber = Math.max(
+        interpretationCards.length,
+        ...normalized.map((thought) => thought.number),
+      )
+      const storedNextNumber = Number(window.localStorage.getItem(nextNumberStorageKey))
+      setNextNumber(Math.max(
+        maxSavedNumber + 1,
+        Number.isFinite(storedNextNumber) ? storedNextNumber : 0,
+      ))
+    } catch {
+      setThoughts([])
+    } finally {
+      setLoaded(true)
+    }
+  }, [nextNumberStorageKey, storageKey])
+
+  useEffect(() => {
+    if (!loaded) return
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify(thoughts))
+    } catch {
+      // 本地存储不可用时，仍允许用户在当前会话中编辑。
+    }
+  }, [loaded, storageKey, thoughts])
+
+  useEffect(() => {
+    if (!loaded) return
+    try {
+      window.localStorage.setItem(nextNumberStorageKey, String(nextNumber))
+    } catch {
+      // 本地存储不可用时，仍允许用户在当前会话中编辑。
+    }
+  }, [loaded, nextNumber, nextNumberStorageKey])
+
+  const addThought = () => {
+    const content = body.trim()
+    if (!content) return
+    setThoughts((current) => [
+      ...current,
+      {
+        id: window.crypto?.randomUUID?.() || `${Date.now()}-${current.length}`,
+        number: nextNumber,
+        title: title.trim() || '我的思考',
+        body: content,
+      },
+    ])
+    setNextNumber((current) => current + 1)
+    setTitle('')
+    setBody('')
+  }
+
+  const startEditing = (thought: PersonalThought) => {
+    setEditingId(thought.id)
+    setEditingTitle(thought.title)
+    setEditingBody(thought.body)
+  }
+
+  const saveEditing = () => {
+    const content = editingBody.trim()
+    if (!editingId || !content) return
+    setThoughts((current) => current.map((thought) => (
+      thought.id === editingId
+        ? { ...thought, title: editingTitle.trim() || '我的思考', body: content }
+        : thought
+    )))
+    setEditingId(null)
+  }
+
+  return (
+    <div className="interpretation-grid">
+      {interpretationCards.map(([cardTitle, cardBody], index) => (
+        <article key={cardTitle}>
+          <span>{String(index + 1).padStart(2, '0')}</span>
+          <h3>{cardTitle}</h3>
+          <p>{cardBody}</p>
+        </article>
+      ))}
+      {thoughts.map((thought) => (
+        <article className="personal-thought-card" key={thought.id}>
+          <span>{String(thought.number).padStart(2, '0')}</span>
+          {editingId === thought.id ? (
+            <div className="thought-edit-form">
+              <input
+                aria-label={`编辑第 ${thought.number} 条思考标题`}
+                value={editingTitle}
+                onChange={(event) => setEditingTitle(event.target.value)}
+              />
+              <textarea
+                aria-label={`编辑第 ${thought.number} 条思考正文`}
+                value={editingBody}
+                onChange={(event) => setEditingBody(event.target.value)}
+              />
+              <div>
+                <button type="button" onClick={saveEditing} disabled={!editingBody.trim()}>保存</button>
+                <button type="button" className="secondary" onClick={() => setEditingId(null)}>取消</button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="thought-card-actions">
+                <button type="button" onClick={() => startEditing(thought)} aria-label={`编辑第 ${thought.number} 条思考`}><Pencil size={13} /></button>
+                <button type="button" onClick={() => setThoughts((current) => current.filter((item) => item.id !== thought.id))} aria-label={`删除第 ${thought.number} 条思考`}><Trash2 size={13} /></button>
+              </div>
+              <h3>{thought.title}</h3>
+              <p>{thought.body}</p>
+            </>
+          )}
+        </article>
+      ))}
+      <article className="thought-composer">
+        <span>{String(nextNumber).padStart(2, '0')}</span>
+        <h3>添加我的思考</h3>
+        <input
+          aria-label="思考标题"
+          placeholder="标题（可选）"
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
+        />
+        <textarea
+          aria-label="思考正文"
+          placeholder="随时记录你对这篇论文的新想法、质疑或研究延伸…"
+          value={body}
+          onChange={(event) => setBody(event.target.value)}
+        />
+        <button type="button" onClick={addThought} disabled={!body.trim()}>
+          <Plus size={14} />
+          添加为第 {String(nextNumber).padStart(2, '0')} 条
+        </button>
+        <small>仅保存在当前浏览器中，刷新页面后仍会保留。</small>
+      </article>
+    </div>
+  )
 }
 
 function PaperPage({ paper, english }: { paper: Paper; english: boolean }) {
@@ -813,7 +979,7 @@ function PaperPage({ paper, english }: { paper: Paper; english: boolean }) {
         <PaperSection id={5} title="识别策略"><IdentificationSection /></PaperSection>
         <PaperSection id={6} title="主要结果图"><ResultsSection /></PaperSection>
         <PaperSection id={7} title="局限与争议"><LimitationsSection /></PaperSection>
-        <PaperSection id={8} title="个人解读"><InterpretationSection /></PaperSection>
+        <PaperSection id={8} title="个人解读"><InterpretationSection key={paper.id} paperId={paper.id} /></PaperSection>
         <PaperSection id={9} title="复现报告">
           <div className="replication-summary">
             <div><span>源码盘点</span><strong>9 个文件 · 8,114 行</strong></div>
