@@ -443,20 +443,35 @@ pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; background: #f3
 .source-guide-meta strong { color: var(--navy); font: 600 16px "Source Serif 4", serif; }
 .source-guide-meta span { color: var(--red); font-size: 10px; }
 .source-guide-meta p { margin: 0; text-align: right; font-size: 11px; }
-.source-code-table { overflow-x: auto; border-top: 1px solid var(--line); }
-.source-code-row {
-  min-width: 880px; display: grid; grid-template-columns: 54px minmax(360px, 1fr) minmax(320px, .9fr);
-  border-bottom: 1px solid #e5e8ed;
+.annotated-code-shell { margin: 0 18px; border: 1px solid #cfd6df; border-radius: 5px; overflow: hidden; background: #f7f7f8; }
+.annotated-code-toolbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  min-height: 48px; padding: 9px 12px; border-bottom: 1px solid #d8dde4; background: #eef1f5;
 }
-.source-code-row > * { padding: 9px 11px; border-right: 1px solid #e5e8ed; }
-.source-code-row > span { color: var(--muted); text-align: right; font: 11px Consolas, monospace; background: #f6f8fa; }
-.source-code-row > div { min-width: 0; display: flex; flex-direction: column; gap: 5px; background: #fbfcfe; }
-.source-code-row small { color: var(--red); font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.source-code-row code { color: #173b68; white-space: pre-wrap; overflow-wrap: anywhere; font: 11px/1.55 Consolas, monospace; }
-.source-code-row p { margin: 0; color: #364359; font: 11px/1.65 "Noto Sans SC", sans-serif; }
-.source-code-head { color: #fff; background: #405570; font-size: 10px; font-weight: 600; }
-.source-code-head > span { color: #fff; background: #405570; font-family: inherit; }
-.source-code-head > * { border-right-color: #60748f; }
+.annotated-code-toolbar > div { display: flex; align-items: center; gap: 8px; }
+.annotated-code-toolbar strong { color: var(--navy); font-size: 11px; }
+.annotated-code-toolbar small { color: var(--muted); font-size: 9px; }
+.language-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+.annotated-copy-actions { display: flex; gap: 7px; }
+.annotated-copy-actions button {
+  display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 6px 9px;
+  border: 1px solid #aeb9c7; border-radius: 3px; color: var(--navy); background: #fff; cursor: pointer;
+  font-size: 9px;
+}
+.annotated-copy-actions button:hover { border-color: var(--navy); background: #f8fafc; }
+.annotated-copy-actions button:focus-visible { outline: 2px solid #7d91aa; outline-offset: 2px; }
+.annotated-code-block {
+  max-height: 680px; overflow: auto; padding: 10px 0 14px; background: #f8f8f9;
+  font: 11px/1.75 Consolas, "Cascadia Mono", "Microsoft YaHei UI", monospace;
+}
+.annotated-code-line { display: grid; grid-template-columns: 54px max-content; min-width: 100%; }
+.annotated-code-line:hover { background: #eef2f6; }
+.annotated-line-number {
+  position: sticky; left: 0; z-index: 1; padding: 0 12px 0 6px; color: #8a96a7;
+  text-align: right; user-select: none; background: #f0f2f5; border-right: 1px solid #d9dee5;
+}
+.annotated-code-line code { display: block; min-width: max-content; padding: 0 18px; color: #17334f; white-space: pre; }
+.annotated-comment { color: #64748b; font-family: Consolas, "Cascadia Mono", "Microsoft YaHei UI", monospace; }
 .source-guide-pagination {
   display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 13px 18px;
   color: var(--muted); font-size: 11px;
@@ -582,6 +597,14 @@ pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; background: #f3
   .source-guide-meta p { text-align: left; }
   .source-guide-controls { grid-template-columns: 1fr; }
   .code-mapping-table > div { grid-template-columns: 1fr; padding: 8px 0; }
+  .annotated-code-shell { margin: 0 10px; }
+  .annotated-code-toolbar { align-items: flex-start; flex-direction: column; }
+  .annotated-copy-actions { width: 100%; }
+  .annotated-copy-actions button { flex: 1; justify-content: center; }
+  .annotated-code-block { max-height: 560px; font-size: 10px; }
+  .annotated-code-line { grid-template-columns: 42px max-content; }
+  .annotated-code-line code { padding: 0 12px; }
+  .annotated-line-number { padding-right: 8px; }
   .embedded-figure-grid, .embedded-table-grid, .embedded-output-section.compact .embedded-figure-grid { grid-template-columns: 1fr; }
   .embedded-output-card iframe { height: 330px; }
   .data-grid { grid-template-columns: 1fr; }

@@ -35,7 +35,7 @@ if (-not (Test-MatrixEconSite)) {
   }
 
   if (-not $ready) {
-    throw 'MatrixEcon 本地服务未能在 30 秒内启动，请运行 npm.cmd run dev:local 查看错误。'
+    throw 'MatrixEcon did not start within 30 seconds. Run npm.cmd run dev:local to inspect the error.'
   }
 }
 
@@ -43,4 +43,4 @@ if (-not $NoBrowser) {
   Start-Process $siteUrl
 }
 
-Write-Output "MatrixEcon 已运行：$siteUrl"
+Write-Output "MatrixEcon is running: $siteUrl"

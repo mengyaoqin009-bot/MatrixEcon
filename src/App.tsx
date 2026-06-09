@@ -1103,12 +1103,31 @@ const codeMappingRows = [
   ['Table IX–X / Figure 7', 'analysis.do L600–680 / L2155–2206', '薪酬方案表决权（SOP）'],
 ]
 
+function codeComment(language: string, content: string) {
+  const normalizedLanguage = language.toLowerCase()
+  if (normalizedLanguage.includes('python')) return `# ${content}`
+  if (normalizedLanguage.includes('sas')) return `/* ${content.replaceAll('*/', '* /')} */`
+  return `// ${content}`
+}
+
+function annotatedCodeLine(record: CodeGuideRecord, language: string) {
+  const annotation = codeComment(
+    language,
+    `[${record.section} · 原第 ${record.line} 行] ${record.explanation}`,
+  )
+  const source = record.code || ''
+
+  if (!source.trim()) return annotation
+  return `${source}  ${annotation}`
+}
+
 function SourceCodeGuide() {
   const [selectedPath, setSelectedPath] = useState(codeGuideFiles[0].path)
   const [payload, setPayload] = useState<CodeGuidePayload | null>(null)
   const [error, setError] = useState('')
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(1)
+  const [copiedScope, setCopiedScope] = useState<'page' | 'all' | null>(null)
   const pageSize = 60
 
   useEffect(() => {
@@ -1137,6 +1156,15 @@ function SourceCodeGuide() {
 
   const pageCount = Math.max(1, Math.ceil(filteredRecords.length / pageSize))
   const visibleRecords = filteredRecords.slice((page - 1) * pageSize, page * pageSize)
+
+  const copyAnnotatedCode = async (scope: 'page' | 'all') => {
+    if (!payload) return
+    const records = scope === 'page' ? visibleRecords : filteredRecords
+    const code = records.map((record) => annotatedCodeLine(record, payload.language)).join('\n')
+    await navigator.clipboard.writeText(code)
+    setCopiedScope(scope)
+    window.setTimeout(() => setCopiedScope(null), 1600)
+  }
 
   return (
     <section className="source-code-guide">
@@ -1179,15 +1207,41 @@ function SourceCodeGuide() {
             <div><strong>{payload.file}</strong><span>{payload.language} · {payload.lineCount.toLocaleString()} 行</span></div>
             <p>{payload.purpose}</p>
           </div>
-          <div className="source-code-table">
-            <div className="source-code-row source-code-head"><span>行</span><span>原始代码</span><span>源码级解释</span></div>
-            {visibleRecords.map((record) => (
-              <div className="source-code-row" key={`${payload.file}-${record.line}`}>
-                <span>{record.line}</span>
-                <div><small>{record.section}</small><code>{record.code || ' '}</code></div>
-                <p>{record.explanation}</p>
+          <div className="annotated-code-shell">
+            <div className="annotated-code-toolbar">
+              <div>
+                <span className="language-dot" />
+                <strong>{payload.language} 注释代码</strong>
+                <small>原始代码 + 中文逐行注释</small>
               </div>
-            ))}
+              <div className="annotated-copy-actions">
+                <button type="button" onClick={() => copyAnnotatedCode('page')}>
+                  {copiedScope === 'page' ? <Check size={14} /> : <Copy size={14} />}
+                  {copiedScope === 'page' ? '当前页已复制' : '复制当前代码块'}
+                </button>
+                <button type="button" onClick={() => copyAnnotatedCode('all')}>
+                  {copiedScope === 'all' ? <Check size={14} /> : <Copy size={14} />}
+                  {copiedScope === 'all' ? '全部已复制' : `复制全部${query ? '搜索结果' : '源码'}`}
+                </button>
+              </div>
+            </div>
+            <div className="annotated-code-block" role="region" aria-label={`${payload.file} 中文逐行注释代码`}>
+              {visibleRecords.map((record) => (
+                <div className="annotated-code-line" key={`${payload.file}-${record.line}`}>
+                  <span className="annotated-line-number">{record.line}</span>
+                  <code>
+                    {record.code && <span className="annotated-source">{record.code}</span>}
+                    <span className="annotated-comment">
+                      {record.code ? '  ' : ''}
+                      {codeComment(
+                        payload.language,
+                        `[${record.section}] ${record.explanation}`,
+                      )}
+                    </span>
+                  </code>
+                </div>
+              ))}
+            </div>
           </div>
           <div className="source-guide-pagination">
             <span>共 {filteredRecords.length.toLocaleString()} 行 · 第 {page} / {pageCount} 页</span>
