@@ -426,9 +426,24 @@ pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; background: #f3
 .translation-reader p, .translation-reader li { color: #303c50; font: 400 14px/1.85 "Source Serif 4", "Noto Serif SC", serif; }
 .translation-reader blockquote { margin: 12px 0 22px; padding: 10px 16px; border-left: 3px solid var(--red); background: #f7f8fa; }
 .translation-reader blockquote p { margin: 0; color: #253852; }
-.translation-reader table { display: block; width: 100%; overflow-x: auto; border-collapse: collapse; margin: 18px 0 28px; font-size: 11px; }
-.translation-reader th, .translation-reader td { min-width: 90px; padding: 8px 10px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
-.translation-reader th { color: var(--navy); background: #f1f4f8; }
+.translation-table-scroll {
+  width: 100%; overflow: auto; margin: 18px 0 28px; border: 1px solid var(--line); background: #fff;
+  scrollbar-gutter: stable;
+}
+.translation-table-scroll:focus-visible { outline: 2px solid #7d91aa; outline-offset: 2px; }
+.translation-reader table { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; }
+.translation-reader th, .translation-reader td {
+  min-width: 105px; max-width: 260px; padding: 8px 10px; border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; overflow-wrap: anywhere;
+}
+.translation-reader tr:last-child td { border-bottom: 0; }
+.translation-reader th:last-child, .translation-reader td:last-child { border-right: 0; }
+.translation-reader th { position: sticky; top: 0; z-index: 2; color: var(--navy); background: #eef2f7; }
+.translation-reader th:first-child, .translation-reader td:first-child {
+  position: sticky; left: 0; z-index: 1; min-width: 170px; color: var(--navy); background: #f8fafc;
+}
+.translation-reader th:first-child { z-index: 3; background: #e8eef5; }
+.translation-reader tbody tr:nth-child(even) td:not(:first-child) { background: #fafbfd; }
 .translation-reader hr { border: 0; border-top: 1px solid var(--line); margin: 32px 0; }
 .translation-reader code { color: var(--red); background: #f3f5f7; padding: 1px 4px; }
 .translation-loading, .translation-error { margin: 0; padding: 30px; text-align: center; }

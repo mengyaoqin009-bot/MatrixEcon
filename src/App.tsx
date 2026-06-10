@@ -1,5 +1,6 @@
 import { isValidElement, useEffect, useMemo, useState, type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import {
   ArrowRight,
   Check,
@@ -1266,7 +1267,12 @@ function TranslationMarkdown({ markdown }: { markdown: string }) {
   const preparedMarkdown = useMemo(() => prepareTranslationMarkdown(markdown), [markdown])
 
   return (
-    <ReactMarkdown components={{
+    <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
+      table: ({ children }) => (
+        <div className="translation-table-scroll" role="region" aria-label="论文表格" tabIndex={0}>
+          <table>{children}</table>
+        </div>
+      ),
       p: ({ children }) => {
         const text = textFromNode(children).trim()
         if (text.startsWith(translationAssetMarker) && text.endsWith(']]')) {
