@@ -733,17 +733,14 @@ function LimitationsSection() {
 
 type PersonalThought = {
   id: string
-  number: number
   title: string
   body: string
 }
 
 function InterpretationSection({ paperId }: { paperId: string }) {
   const storageKey = `matrixecon:paper-thoughts:${paperId}`
-  const nextNumberStorageKey = `${storageKey}:next-number`
   const [thoughts, setThoughts] = useState<PersonalThought[]>([])
   const [loaded, setLoaded] = useState(false)
-  const [nextNumber, setNextNumber] = useState(interpretationCards.length + 1)
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -759,26 +756,17 @@ function InterpretationSection({ paperId }: { paperId: string }) {
         .filter((thought) => typeof thought.title === 'string' && typeof thought.body === 'string')
         .map((thought, index) => ({
           id: thought.id || `legacy-${index}`,
-          number: typeof thought.number === 'number' ? thought.number : interpretationCards.length + index + 1,
           title: thought.title || '我的思考',
           body: thought.body || '',
         }))
       setThoughts(normalized)
-      const maxSavedNumber = Math.max(
-        interpretationCards.length,
-        ...normalized.map((thought) => thought.number),
-      )
-      const storedNextNumber = Number(window.localStorage.getItem(nextNumberStorageKey))
-      setNextNumber(Math.max(
-        maxSavedNumber + 1,
-        Number.isFinite(storedNextNumber) ? storedNextNumber : 0,
-      ))
+      window.localStorage.removeItem(`${storageKey}:next-number`)
     } catch {
       setThoughts([])
     } finally {
       setLoaded(true)
     }
-  }, [nextNumberStorageKey, storageKey])
+  }, [storageKey])
 
   useEffect(() => {
     if (!loaded) return
@@ -789,15 +777,6 @@ function InterpretationSection({ paperId }: { paperId: string }) {
     }
   }, [loaded, storageKey, thoughts])
 
-  useEffect(() => {
-    if (!loaded) return
-    try {
-      window.localStorage.setItem(nextNumberStorageKey, String(nextNumber))
-    } catch {
-      // 本地存储不可用时，仍允许用户在当前会话中编辑。
-    }
-  }, [loaded, nextNumber, nextNumberStorageKey])
-
   const addThought = () => {
     const content = body.trim()
     if (!content) return
@@ -805,12 +784,10 @@ function InterpretationSection({ paperId }: { paperId: string }) {
       ...current,
       {
         id: window.crypto?.randomUUID?.() || `${Date.now()}-${current.length}`,
-        number: nextNumber,
         title: title.trim() || '我的思考',
         body: content,
       },
     ])
-    setNextNumber((current) => current + 1)
     setTitle('')
     setBody('')
   }
@@ -841,18 +818,20 @@ function InterpretationSection({ paperId }: { paperId: string }) {
           <p>{cardBody}</p>
         </article>
       ))}
-      {thoughts.map((thought) => (
+      {thoughts.map((thought, thoughtIndex) => {
+        const thoughtNumber = interpretationCards.length + thoughtIndex + 1
+        return (
         <article className="personal-thought-card" key={thought.id}>
-          <span>{String(thought.number).padStart(2, '0')}</span>
+          <span>{String(thoughtNumber).padStart(2, '0')}</span>
           {editingId === thought.id ? (
             <div className="thought-edit-form">
               <input
-                aria-label={`编辑第 ${thought.number} 条思考标题`}
+                aria-label={`编辑第 ${thoughtNumber} 条思考标题`}
                 value={editingTitle}
                 onChange={(event) => setEditingTitle(event.target.value)}
               />
               <textarea
-                aria-label={`编辑第 ${thought.number} 条思考正文`}
+                aria-label={`编辑第 ${thoughtNumber} 条思考正文`}
                 value={editingBody}
                 onChange={(event) => setEditingBody(event.target.value)}
               />
@@ -864,17 +843,18 @@ function InterpretationSection({ paperId }: { paperId: string }) {
           ) : (
             <>
               <div className="thought-card-actions">
-                <button type="button" onClick={() => startEditing(thought)} aria-label={`编辑第 ${thought.number} 条思考`}><Pencil size={13} /></button>
-                <button type="button" onClick={() => setThoughts((current) => current.filter((item) => item.id !== thought.id))} aria-label={`删除第 ${thought.number} 条思考`}><Trash2 size={13} /></button>
+                <button type="button" onClick={() => startEditing(thought)} aria-label={`编辑第 ${thoughtNumber} 条思考`}><Pencil size={13} /></button>
+                <button type="button" onClick={() => setThoughts((current) => current.filter((item) => item.id !== thought.id))} aria-label={`删除第 ${thoughtNumber} 条思考`}><Trash2 size={13} /></button>
               </div>
               <h3>{thought.title}</h3>
               <p>{thought.body}</p>
             </>
           )}
         </article>
-      ))}
+        )
+      })}
       <article className="thought-composer">
-        <span>{String(nextNumber).padStart(2, '0')}</span>
+        <span>{String(interpretationCards.length + thoughts.length + 1).padStart(2, '0')}</span>
         <h3>添加我的思考</h3>
         <input
           aria-label="思考标题"
@@ -890,9 +870,9 @@ function InterpretationSection({ paperId }: { paperId: string }) {
         />
         <button type="button" onClick={addThought} disabled={!body.trim()}>
           <Plus size={14} />
-          添加为第 {String(nextNumber).padStart(2, '0')} 条
+          添加为第 {String(interpretationCards.length + thoughts.length + 1).padStart(2, '0')} 条
         </button>
-        <small>仅保存在当前浏览器中，刷新页面后仍会保留。</small>
+        <small>仅保存在当前浏览器中；刷新后保留，删除后自动连续重编号。</small>
       </article>
     </div>
   )
