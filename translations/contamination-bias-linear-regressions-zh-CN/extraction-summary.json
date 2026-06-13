@@ -1,0 +1,7 @@
+{
+  "pdf": "inputs/paper/contamination-bias/Contamination Bias in Linear Regressions.pdf",
+  "pages": 70,
+  "chars": 169136,
+  "non_empty_pages": 70,
+  "first_page_preview": "Contamination Bias in Linear Regressions ∗\nPaul Goldsmith-Pinkham\nYale University\nPeter Hull\nBrown University\nMichal Kolesár\nPrinceton University\nJune 21, 2024\nAbstract\nWe study regressions with multiple treatments and a set of controls that is flexible\nenough to purge omitted variable bias. We show that these regressions generally fail\nto estimate convex averages of heterogeneous treatment effects—instead, estimates of\neach treatment’s effect are contaminated by non-convex averages of the effects of other\ntreatments. We discuss three estimation approaches that avoid such contamination bias,\nincluding the targeting of easiest-to-estimate weighted average effects. A re-analysis of\nnine empirical applications finds economically and statistically meaningful contamina-\ntion bias in observation"
+}

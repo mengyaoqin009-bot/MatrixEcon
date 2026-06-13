@@ -1,0 +1,118 @@
+﻿QJEReplication\.DS_Store
+QJEReplication\analyze_trade.m
+QJEReplication\Data\alldata.mat
+QJEReplication\Data\other\F-F_Research_Data_Factors.txt
+QJEReplication\Data\other\vix_cboe_monthly.mat
+QJEReplication\figure2.m
+QJEReplication\figure3.m
+QJEReplication\figure5_table3.m
+QJEReplication\figure6_table4.m
+QJEReplication\figure7.m
+QJEReplication\figure9.m
+QJEReplication\Figures\calib.pdf
+QJEReplication\Figures\direction_trade_longmaturity.pdf
+QJEReplication\Figures\fig_vs_short_2.pdf
+QJEReplication\Figures\fig_vs_short_3.pdf
+QJEReplication\Figures\loadings1.pdf
+QJEReplication\Figures\loadings2.pdf
+QJEReplication\Figures\meas2.pdf
+QJEReplication\Figures\ne.pdf
+QJEReplication\Figures\return.pdf
+QJEReplication\Figures\return_histogram.pdf
+QJEReplication\Figures\roll_vs_short_1.pdf
+QJEReplication\Figures\roll_vs_short_2.pdf
+QJEReplication\Figures\rolling_Sharpe.pdf
+QJEReplication\Kalman Results\cds_BOFA_final.mat
+QJEReplication\Kalman Results\cds_BRAZIL_final.mat
+QJEReplication\Kalman Results\cds_GE_final.mat
+QJEReplication\Kalman Results\cds_RUSSIA_final.mat
+QJEReplication\Kalman Results\f_CL_final.mat
+QJEReplication\Kalman Results\f_GC_final.mat
+QJEReplication\Kalman Results\inflswap_eu_final.mat
+QJEReplication\Kalman Results\inflswap_us_final.mat
+QJEReplication\Kalman Results\iv_interp_apple_final.mat
+QJEReplication\Kalman Results\iv_interp_citi_final.mat
+QJEReplication\Kalman Results\iv_interp_dax_final.mat
+QJEReplication\Kalman Results\iv_interp_euro_final.mat
+QJEReplication\Kalman Results\iv_interp_stoxx_final.mat
+QJEReplication\Kalman Results\iv_interp_yen_final.mat
+QJEReplication\Kalman Results\kalmanresults.mat
+QJEReplication\Kalman Results\usyc_final.mat
+QJEReplication\Kalman_Alternative_New_Guess.m
+QJEReplication\Kalman_Futures_Guess.m
+QJEReplication\predvariance21.m
+QJEReplication\predvariance21_coeff.m
+QJEReplication\predvariance21_futures.m
+QJEReplication\predvariance21_iv.m
+QJEReplication\predvariance21_rollingrho.m
+QJEReplication\predvariance21_trade.m
+QJEReplication\readme.txt
+QJEReplication\Regression Results\results_futures_regression_2.mat
+QJEReplication\Regression Results\results_futures_regression_3.mat
+QJEReplication\Regression Results\results_regression_2.mat
+QJEReplication\Regression Results\results_regression_3.mat
+QJEReplication\Run_Kalman.m
+QJEReplication\Run_Regression.m
+QJEReplication\Run_Regression_Futures.m
+QJEReplication\run_trade_sims_table6.m
+QJEReplication\run_trade_vs.m
+QJEReplication\simulate_arfima.m
+QJEReplication\Summarize_Results.m
+QJEReplication\tables_figures_trade.m
+QJEReplication\trade_insample.m
+QJEReplication\trade_insample_sim.m
+QJEReplication\trade_outsample.m
+QJEReplication\utility\acoeff_to_ne_phi.m
+QJEReplication\utility\arfima_covs.m
+QJEReplication\utility\arfima_exactlik.m
+QJEReplication\utility\arfima_forecast.m
+QJEReplication\utility\arma_covs.m
+QJEReplication\utility\B_to_rho_simple.m
+QJEReplication\utility\B_to_rho_simple_futures.m
+QJEReplication\utility\boundednoline.m
+QJEReplication\utility\cols.m
+QJEReplication\utility\durlevML.c
+QJEReplication\utility\durlevML.mexmaci64
+QJEReplication\utility\export_fig\.gitignore
+QJEReplication\utility\export_fig\.ignore\ghostscript.txt
+QJEReplication\utility\export_fig\.ignore\gs_font_path.txt
+QJEReplication\utility\export_fig\append_pdfs.m
+QJEReplication\utility\export_fig\copyfig.m
+QJEReplication\utility\export_fig\crop_borders.m
+QJEReplication\utility\export_fig\eps2pdf.m
+QJEReplication\utility\export_fig\export_fig.m
+QJEReplication\utility\export_fig\fix_lines.m
+QJEReplication\utility\export_fig\ghostscript.m
+QJEReplication\utility\export_fig\im2gif.m
+QJEReplication\utility\export_fig\ImageSelection.class
+QJEReplication\utility\export_fig\ImageSelection.java
+QJEReplication\utility\export_fig\isolate_axes.m
+QJEReplication\utility\export_fig\LICENSE
+QJEReplication\utility\export_fig\pdf2eps.m
+QJEReplication\utility\export_fig\pdftops.m
+QJEReplication\utility\export_fig\print2array.m
+QJEReplication\utility\export_fig\print2eps.m
+QJEReplication\utility\export_fig\read_write_entire_textfile.m
+QJEReplication\utility\export_fig\README.md
+QJEReplication\utility\export_fig\user_string.m
+QJEReplication\utility\export_fig\using_hg2.m
+QJEReplication\utility\interpolateprices.m
+QJEReplication\utility\jacobianest_fast.m
+QJEReplication\utility\lag.m
+QJEReplication\utility\mainplot.m
+QJEReplication\utility\MatlabExcelMac\cell2char.m
+QJEReplication\utility\MatlabExcelMac\Cell2JavaString.m
+QJEReplication\utility\MatlabExcelMac\jxl.jar
+QJEReplication\utility\MatlabExcelMac\license.txt
+QJEReplication\utility\MatlabExcelMac\MXL.jar
+QJEReplication\utility\MatlabExcelMac\Test_xlwrite.m
+QJEReplication\utility\MatlabExcelMac\WriteXL.java
+QJEReplication\utility\MatlabExcelMac\xlwrite.m
+QJEReplication\utility\ne_to_acoeff_phi.m
+QJEReplication\utility\plotwithaxis.m
+QJEReplication\utility\sim_2fac_for_trading.m
+QJEReplication\utility\sim_arfima_for_trading.m
+QJEReplication\utility\sim_star.m
+QJEReplication\utility\stdize.m
+QJEReplication\utility\trimr.m
+QJEReplication\utility\vec.m

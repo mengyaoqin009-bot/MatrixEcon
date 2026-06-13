@@ -1,0 +1,650 @@
+{
+  "pdf": "C:\\Users\\qinmengyao\\Zotero\\storage\\X7GMTK6X\\Giglio和Kelly - 2018 - Excess Volatility Beyond Discount Rates.pdf",
+  "pages": 58,
+  "chars": 140414,
+  "non_empty_pages": 58,
+  "figtab_count": 0,
+  "figtab": [],
+  "headings": [
+    {
+      "page": 1,
+      "line": "EXCESS VOLATILITY"
+    },
+    {
+      "page": 1,
+      "line": "Author(s): Stefano Giglio and Bryan Kelly"
+    },
+    {
+      "page": 1,
+      "line": "Source: The Quarterly Journal of Economics , February 2018, Vol. 133, No. 1 (February"
+    },
+    {
+      "page": 1,
+      "line": "Published by: Oxford University Press"
+    },
+    {
+      "page": 1,
+      "line": "Stable URL: https://www.jstor.org/stable/10.2307/26495159"
+    },
+    {
+      "page": 1,
+      "line": "REFERENCES"
+    },
+    {
+      "page": 1,
+      "line": "Linked references are available on JSTOR for this article:"
+    },
+    {
+      "page": 1,
+      "line": "You may need to log in to JSTOR to access the linked references."
+    },
+    {
+      "page": 1,
+      "line": "JSTOR is a not-for-profit service that helps scholars, researchers, and students discover, use, and build upon a wide"
+    },
+    {
+      "page": 1,
+      "line": "Your use of the JSTOR archive indicates your acceptance of the Terms & Conditions of Use, available at"
+    },
+    {
+      "page": 1,
+      "line": "Oxford University Press is collaborating with JSTOR to digitize, preserve and extend access to The"
+    },
+    {
+      "page": 1,
+      "line": "Quarterly Journal of Economics"
+    },
+    {
+      "page": 1,
+      "line": "This content downloaded from"
+    },
+    {
+      "page": 1,
+      "line": "All use subject to https://about.jstor.org/terms"
+    },
+    {
+      "page": 2,
+      "line": "EXCESS VOLATILITY: BEYOND DISCOUNT RATES *"
+    },
+    {
+      "page": 2,
+      "line": "STEFANO GIGLIO AND BRYAN KELLY"
+    },
+    {
+      "page": 2,
+      "line": "We document a form of excess volatility that is difﬁcult to reconcile with"
+    },
+    {
+      "page": 2,
+      "line": "We compare prices of claims on the same cash ﬂow stream but with different"
+    },
+    {
+      "page": 2,
+      "line": "Term structure analysis is a powerful setting for evaluating a"
+    },
+    {
+      "page": 2,
+      "line": "1 This"
+    },
+    {
+      "page": 2,
+      "line": "Gabaix, Valentin Haddad, Lloyd Han, Lars Hansen, Roni Israelov , Lawrence Jin,"
+    },
+    {
+      "page": 2,
+      "line": "Ralph Koijen, Ahn Le, Martin Lettau, Hanno Lustig, Matteo Maggiori, Tim Mc-"
+    },
+    {
+      "page": 2,
+      "line": "Pruitt, Martin Schneider , Andrei Shleifer , Jeremy Stein, Dick Thaler , Pietro"
+    },
+    {
+      "page": 2,
+      "line": "Veronesi, Rob Vishny , and Cynthia Wu for helpful comments; seminar partici-"
+    },
+    {
+      "page": 2,
+      "line": "Houston, LBS, NYU , Stanford, UBC, UT Austin, UT Dallas, Y ale, and Wharton;"
+    },
+    {
+      "page": 2,
+      "line": "1. For seminal work on the role of cross-equation restrictions and the law"
+    },
+    {
+      "page": 2,
+      "line": "Hansen and Scheinkman (2009) ,a n dHansen (2012)."
+    },
+    {
+      "page": 2,
+      "line": "The Quarterly Journal of Economics (2018), 71–127. doi:10.1093/qje/qjx034."
+    },
+    {
+      "page": 2,
+      "line": "Advance Access publication on August 26, 2017."
+    },
+    {
+      "page": 2,
+      "line": "This content downloaded from"
+    },
+    {
+      "page": 2,
+      "line": "All use subject to https://about.jstor.org/terms"
+    },
+    {
+      "page": 3,
+      "line": "72 QUARTERL Y JOURNAL OF ECONOMICS"
+    },
+    {
+      "page": 3,
+      "line": "In this article, we document a form of excess volatility in"
+    },
+    {
+      "page": 3,
+      "line": "We refer to this class of models as “afﬁne- Q” following ter-"
+    },
+    {
+      "page": 3,
+      "line": "2. For example, a linear three-factor model explains the panel of Treasury"
+    },
+    {
+      "page": 3,
+      "line": "3. We discuss afﬁne structural models in Online Appendix A."
+    },
+    {
+      "page": 3,
+      "line": "This content downloaded from"
+    },
+    {
+      "page": 3,
+      "line": "All use subject to https://about.jstor.org/terms"
+    },
+    {
+      "page": 4,
+      "line": "EXCESS VOLATILITY 73"
+    },
+    {
+      "page": 4,
+      "line": "There is an important advantage in working directly with the"
+    },
+    {
+      "page": 4,
+      "line": "Q representation of asset prices when studying the term structure."
+    },
+    {
+      "page": 4,
+      "line": "Because it integrates investor risk preferences into its description"
+    },
+    {
+      "page": 4,
+      "line": "Therefore, any inferences regarding price volatility that are based"
+    },
+    {
+      "page": 4,
+      "line": "This contrasts with the notion of excess volatility famously"
+    },
+    {
+      "page": 4,
+      "line": "Shiller puzzle is to recognize that discount rates are variable,"
+    },
+    {
+      "page": 4,
+      "line": "5 By benchmarking against the Q representation of mod-"
+    },
+    {
+      "page": 4,
+      "line": "Q class as a null model for our analysis because it explicitly ac-"
+    },
+    {
+      "page": 4,
+      "line": "Our main empirical ﬁnding is that in every asset class that"
+    },
+    {
+      "page": 4,
+      "line": "Consider a term structure of claims to the one-factor cash ﬂow"
+    },
+    {
+      "page": 4,
+      "line": "4. More speciﬁcally , the Q measure incorporates variation in risk premia,"
+    },
+    {
+      "page": 4,
+      "line": "5. See, for example, Campbell and Shiller ( 1987, 1988a,b, 1991), Fama and"
+    },
+    {
+      "page": 4,
+      "line": "Bliss (1987), Campbell (1987, 1991, 1995), Cochrane (1992, 2008, 2011), and"
+    },
+    {
+      "page": 4,
+      "line": "Cochrane and Piazzesi (2009) ."
+    },
+    {
+      "page": 4,
+      "line": "This content downloaded from"
+    },
+    {
+      "page": 4,
+      "line": "All use subject to https://about.jstor.org/terms"
+    },
+    {
+      "page": 5,
+      "line": "74 QUARTERL Y JOURNAL OF ECONOMICS"
+    },
+    {
+      "page": 5,
+      "line": "Under the pricing measure Q, cash ﬂows evolve according to 6"
+    },
+    {
+      "page": 5,
+      "line": "We abstract from constants and risk-free rate adjustments in this"
+    },
+    {
+      "page": 5,
+      "line": "T h e t e r m s t r u c t u r e o f f o r w a r d p r i c e s a t m a t u r i t i e s 1 , ...,N is"
+    },
+    {
+      "page": 5,
+      "line": "The key cross-equation restrictions in this model require that the"
+    },
+    {
+      "page": 5,
+      "line": "Tests of the model’s restrictions hinge on an estimate of ρQ."
+    },
+    {
+      "page": 5,
+      "line": "Fortunately ,ρQ is easily estimated from regressions of prices onto"
+    },
+    {
+      "page": 5,
+      "line": "According to equation (2), b2 exactly recovers ρQ. This regression"
+    },
+    {
+      "page": 5,
+      "line": "6. Autoregressive models for variance are standard in the time series and"
+    },
+    {
+      "page": 5,
+      "line": "This content downloaded from"
+    },
+    {
+      "page": 5,
+      "line": "All use subject to https://about.jstor.org/terms"
+    },
+    {
+      "page": 6,
+      "line": "EXCESS VOLATILITY 75"
+    },
+    {
+      "page": 6,
+      "line": "If we project prices for remaining maturities 3, . . . , N onto"
+    },
+    {
+      "page": 6,
+      "line": "We convert this restriction into a test of excess volatility by con-"
+    },
+    {
+      "page": 6,
+      "line": "The numerator ,Var(bNft,1), is the explained variance in the unre-"
+    },
+    {
+      "page": 6,
+      "line": "The denominator ,Var((b2)N−1 ft,1), is the explained variance of the"
+    },
+    {
+      "page": 6,
+      "line": "If the ratio statistic signiﬁcantly exceeds 1, the price at maturity"
+    },
+    {
+      "page": 6,
+      "line": "N varies more than is justiﬁed by the behavior of the short end of"
+    },
+    {
+      "page": 6,
+      "line": "This one-factor example is intentionally simpliﬁed to illus-"
+    },
+    {
+      "page": 6,
+      "line": "N in general K-factor afﬁne speciﬁcations that"
+    },
+    {
+      "page": 6,
+      "line": "Figure I illustrates the behavior of variance ratios in one of"
+    },
+    {
+      "page": 6,
+      "line": "7. Note that VRN is simply the squared ratio of the unrestricted regression"
+    },
+    {
+      "page": 6,
+      "line": "This content downloaded from"
+    },
+    {
+      "page": 6,
+      "line": "All use subject to https://about.jstor.org/terms"
+    },
+    {
+      "page": 7,
+      "line": "76 QUARTERL Y JOURNAL OF ECONOMICS"
+    },
+    {
+      "page": 7,
+      "line": "FIGURE I"
+    },
+    {
+      "page": 7,
+      "line": "Variance Swap Tests"
+    },
+    {
+      "page": 7,
+      "line": "The dashed line plots the explained variation from the regression"
+    },
+    {
+      "page": 7,
+      "line": "8. These data are described in detail in Section III."
+    },
+    {
+      "page": 7,
+      "line": "This content downloaded from"
+    },
+    {
+      "page": 7,
+      "line": "All use subject to https://about.jstor.org/terms"
+    },
+    {
+      "page": 8,
+      "line": "EXCESS VOLATILITY 77"
+    },
+    {
+      "page": 8,
+      "line": "As a result, unrestricted price volatility increases with maturity"
+    },
+    {
+      "page": 8,
+      "line": "The excess volatility of long-maturity claims is not explained"
+    },
+    {
+      "page": 8,
+      "line": "Behavior of the variance swap term structure is representa-"
+    },
+    {
+      "page": 8,
+      "line": "Tests of excess volatility are fundamentally tests of market ef-"
+    },
+    {
+      "page": 8,
+      "line": "Market efﬁciency per se is not testable. It must be tested jointly with"
+    },
+    {
+      "page": 8,
+      "line": "9. We interpret high variance ratios as excess volatility at long maturities,"
+    },
+    {
+      "page": 8,
+      "line": "This content downloaded from"
+    },
+    {
+      "page": 8,
+      "line": "All use subject to https://about.jstor.org/terms"
+    },
+    {
+      "page": 9,
+      "line": "78 QUARTERL Y JOURNAL OF ECONOMICS"
+    },
+    {
+      "page": 9,
+      "line": "In the last part of the article, we investigate how the sources of ex-"
+    },
+    {
+      "page": 9,
+      "line": "In robustness checks, we show that gradually increasing the"
+    },
+    {
+      "page": 9,
+      "line": "Second, we explore a wide range of long-memory models in the"
+    },
+    {
+      "page": 9,
+      "line": "Fourth, we evaluate the role of measurement error in our em-"
+    },
+    {
+      "page": 9,
+      "line": "This content downloaded from"
+    },
+    {
+      "page": 9,
+      "line": "All use subject to https://about.jstor.org/terms"
+    },
+    {
+      "page": 10,
+      "line": "EXCESS VOLATILITY 79"
+    },
+    {
+      "page": 10,
+      "line": "Finally , we explore the possibility of mispricing as a poten-"
+    },
+    {
+      "page": 10,
+      "line": "In the variance swap market, we ﬁnd that the trading strat-"
+    },
+    {
+      "page": 10,
+      "line": "Second, we explore theoretical underpinnings of excess"
+    },
+    {
+      "page": 10,
+      "line": "Mendel 2010). This framework posits that investors price assets"
+    },
+    {
+      "page": 10,
+      "line": "10. The existence of proﬁtable trading opportunities is not a necessary con-"
+    },
+    {
+      "page": 10,
+      "line": "All use subject to https://about.jstor.org/terms"
+    },
+    {
+      "page": 11,
+      "line": "80 QUARTERL Y JOURNAL OF ECONOMICS"
+    },
+    {
+      "page": 11,
+      "line": "Perhaps the most important predecessor of our article is the"
+    },
+    {
+      "page": 11,
+      "line": "Our evidence further encourages efforts to reconcile mod-"
+    },
+    {
+      "page": 11,
+      "line": "11. The Treasury yield curve is the subject of a large literature that works"
+    },
+    {
+      "page": 11,
+      "line": "Singleton, and Dai (2010) , Piazzesi (2010),a n d Joslin, Singleton, and Zhu (2011) ."
+    },
+    {
+      "page": 11,
+      "line": "Our focus is on volatility of prices at different maturities. A distinct literature stud-"
+    },
+    {
+      "page": 11,
+      "line": "This content downloaded from"
+    },
+    {
+      "page": 11,
+      "line": "All use subject to https://about.jstor.org/terms"
+    },
+    {
+      "page": 12,
+      "line": "EXCESS VOLATILITY 81"
+    },
+    {
+      "page": 12,
+      "line": "In this section we develop and test the internal consistency"
+    },
+    {
+      "page": 12,
+      "line": "Our focus is on the joint price behavior of claims to an un-"
+    },
+    {
+      "page": 12,
+      "line": "We discuss the extension to linear exponential claims in Online"
+    },
+    {
+      "page": 12,
+      "line": "Appendix B."
+    },
+    {
+      "page": 12,
+      "line": "At time t, a linear n-maturity forward claim promises a one-"
+    },
+    {
+      "page": 12,
+      "line": "12. Recent examples of research into expectation formation related to our"
+    },
+    {
+      "page": 12,
+      "line": "Shleifer , and Vishny (2015), Bordalo, Gennaioli, and Shleifer (2015), Barberis"
+    },
+    {
+      "page": 12,
+      "line": "13. The obvious exception is the Treasury bond market, in which case we"
+    },
+    {
+      "page": 12,
+      "line": "This content downloaded from"
+    },
+    {
+      "page": 12,
+      "line": "All use subject to https://about.jstor.org/terms"
+    },
+    {
+      "page": 13,
+      "line": "82 QUARTERL Y JOURNAL OF ECONOMICS"
+    },
+    {
+      "page": 13,
+      "line": "Prices of one-off forward claims aggregate into linear cu-"
+    },
+    {
+      "page": 13,
+      "line": "Under no arbitrage, the pricing measure possesses a martingale"
+    },
+    {
+      "page": 13,
+      "line": "Our baseline model is deﬁned by the following assumptions."
+    },
+    {
+      "page": 13,
+      "line": "ASSUMPTION 1. The cash ﬂow process, xt, is a linear function of K"
+    },
+    {
+      "page": 13,
+      "line": "1 Ht,"
+    },
+    {
+      "page": 13,
+      "line": "ASSUMPTION 2. Under the Q measure, Ht evolves as"
+    },
+    {
+      "page": 13,
+      "line": "ASSUMPTION 3. The matrix ρQ is diagonal, cQ is 0, and δ1 is a vector"
+    },
+    {
+      "page": 13,
+      "line": "Assumptions 1 and 2 ensure that the price of all cash ﬂow"
+    },
+    {
+      "page": 13,
+      "line": "This content downloaded from"
+    },
+    {
+      "page": 13,
+      "line": "All use subject to https://about.jstor.org/terms"
+    },
+    {
+      "page": 14,
+      "line": "EXCESS VOLATILITY 83"
+    },
+    {
+      "page": 14,
+      "line": "Because the Ht factors are latent, the system speciﬁcation"
+    },
+    {
+      "page": 14,
+      "line": "The price of a linear cumulative claim with maturity n is"
+    },
+    {
+      "page": 14,
+      "line": "This equation follows from Assumptions 1–3. In addition, we fol-"
+    },
+    {
+      "page": 14,
+      "line": "We propose two approaches to testing the internal consistency"
+    },
+    {
+      "page": 14,
+      "line": "14. We report a simple example illustrating the link between P and Q mea-"
+    },
+    {
+      "page": 14,
+      "line": "This content downloaded from"
+    },
+    {
+      "page": 14,
+      "line": "All use subject to https://about.jstor.org/terms"
+    },
+    {
+      "page": 15,
+      "line": "84 QUARTERL Y JOURNAL OF ECONOMICS"
+    },
+    {
+      "page": 15,
+      "line": "1. Regression-Based Tests. Our ﬁrst set of excess volatility"
+    },
+    {
+      "page": 15,
+      "line": "ASSUMPTION 4REG. Under the P measure, the term structure of"
+    },
+    {
+      "page": 15,
+      "line": "Wald test consistency ."
+    },
+    {
+      "page": 15,
+      "line": "15 In addition, for a K-factor model,"
+    },
+    {
+      "page": 15,
+      "line": "To construct the regression-based excess volatility test, let"
+    },
+    {
+      "page": 15,
+      "line": "Because observed short-maturity prices Pt,1:K stand in for la-"
+    },
+    {
+      "page": 15,
+      "line": "Under the afﬁne- Q speciﬁcation, the population slope coefﬁcients"
+    },
+    {
+      "page": 15,
+      "line": "15. See, for example, Hayashi (2000), Proposition 2.3. In particular , the term"
+    },
+    {
+      "page": 15,
+      "line": "This content downloaded from"
+    },
+    {
+      "page": 15,
+      "line": "All use subject to https://about.jstor.org/terms"
+    },
+    {
+      "page": 16,
+      "line": "EXCESS VOLATILITY 85"
+    },
+    {
+      "page": 16,
+      "line": "This is a system of K polynomial equations in the K unknown pa-"
+    }
+  ]
+}
